@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Catch Log</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Catch Log">
+<meta name="theme-color" content="#1B2430">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1B2430;
+    --surface: #232E3D;
+    --surface-2: #2C3A4B;
+    --border: #38485C;
+    --text: #EDEFF2;
+    --text-dim: #9AA7B5;
+    --text-faint: #6B7889;
+    --coral: #E36B6B;
+    --coral-dim: #7A3C3C;
+    --teal: #5EC8B8;
+    --teal-dim: #2E5A54;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{
+    margin:0; padding:0; background:var(--bg); color:var(--text);
+    font-family:'Inter',system-ui,sans-serif;
+    min-height:100dvh;
+    overscroll-behavior-y: none;
+  }
+  body{
+    padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+    max-width: 480px; margin: 0 auto;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--text-faint); margin: 0 0 2px;
+  }
+  h1{
+    font-family:'Fraunces', serif; font-weight: 500; font-size: 28px;
+    margin: 0 0 22px; letter-spacing: -0.01em;
+  }
+  .log-btn{
+    width: 100%; border: none; border-radius: 20px;
+    background: linear-gradient(180deg, #E88080, var(--coral));
+    color: #3A1414; font-family:'Fraunces', serif; font-weight: 600;
+    font-size: 22px; padding: 30px 0; cursor: pointer;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    transition: transform .08s ease;
+  }
+  .log-btn:active{ transform: scale(0.97); }
+  .log-btn .sub{
+    font-family:'Inter',sans-serif; font-weight:500; font-size:12.5px;
+    color: #4A1E1E; opacity: .75; letter-spacing: 0.01em;
+  }
+  .toast{
+    margin-top: 14px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 16px 18px; display: none;
+  }
+  .toast.show{ display:block; }
+  .toast-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .toast-head span{ font-size: 13px; color: var(--text-dim); }
+  .toast-head .time{ font-family:'IBM Plex Mono', monospace; color: var(--teal); font-size:13px; }
+  .close-x{
+    background:none; border:none; color:var(--text-faint); font-size:18px;
+    cursor:pointer; line-height:1; padding:4px;
+  }
+  .field-label{ font-size: 12.5px; color: var(--text-dim); margin: 14px 0 8px; }
+  .field-label:first-of-type{ margin-top:0; }
+  .hip-wrap{ display:flex; justify-content:center; padding: 4px 0 2px; }
+  .hip-side{ cursor:pointer; transition: opacity .15s; }
+  .hip-side rect, .hip-side circle{ transition: fill .15s, stroke .15s; }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--text-dim);
+    border-radius: 999px; padding: 8px 14px; font-size: 13px; cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+  .chip.active{ background: var(--teal-dim); border-color: var(--teal); color: var(--teal); }
+  textarea{
+    width:100%; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); padding: 10px 12px; font-family:'Inter',sans-serif;
+    font-size: 14px; resize: vertical; min-height: 54px;
+  }
+  textarea::placeholder{ color: var(--text-faint); }
+  .save-btn{
+    width:100%; margin-top:16px; background: var(--teal); border:none; border-radius:10px;
+    color:#0E332C; font-weight:600; font-size:14px; padding:12px 0; cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+  .stats{ display:flex; gap:10px; margin: 22px 0 8px; }
+  .stat{
+    flex:1; background: var(--surface); border:1px solid var(--border); border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .stat .n{ font-family:'IBM Plex Mono', monospace; font-size:20px; color:var(--text); }
+  .stat .l{ font-size: 11px; color: var(--text-faint); margin-top:2px; }
+  .section-head{ display:flex; justify-content:space-between; align-items:baseline; margin: 26px 0 10px; }
+  .section-head h2{
+    font-family:'Fraunces', serif; font-weight:500; font-size:16px; margin:0; color:var(--text);
+  }
+  .tools{ display:flex; gap:14px; }
+  .tools button{
+    background:none; border:none; color: var(--text-faint); font-size:12px;
+    font-family:'IBM Plex Mono', monospace; cursor:pointer; padding:0;
+  }
+  .tools button:hover{ color: var(--text-dim); }
+  .empty{
+    text-align:center; color: var(--text-faint); font-size: 13.5px; padding: 40px 10px;
+    border: 1px dashed var(--border); border-radius: var(--radius);
+  }
+  .day-group{ margin-bottom: 18px; }
+  .day-label{
+    font-family:'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-faint);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+  }
+  .entry{
+    background: var(--surface); border:1px solid var(--border); border-radius: 12px;
+    padding: 12px 14px; margin-bottom: 8px; cursor:pointer;
+  }
+  .entry-top{ display:flex; justify-content:space-between; align-items:center; }
+  .entry-time{ font-family:'IBM Plex Mono', monospace; font-size: 14px; color: var(--text); }
+  .entry-meta{ font-size: 12px; color: var(--text-faint); }
+  .entry-detail{ margin-top: 8px; font-size: 13px; color: var(--text-dim); display:none; }
+  .entry.open .entry-detail{ display:block; }
+  .del{
+    color: var(--coral); background:none; border:none; font-size:12px; margin-top:10px;
+    cursor:pointer; font-family:'IBM Plex Mono', monospace; padding:0;
+  }
+  footer{
+    text-align:center; color: var(--text-faint); font-size: 11px; margin: 30px 0 10px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  #importFile{ display:none; }
+</style>
+</head>
+<body>
+
+  <p class="eyebrow">Bilateral hip · episode tracker</p>
+  <h1>Catch log</h1>
+
+  <button class="log-btn" id="logBtn">
+    Log it now
+    <span class="sub">Saves instantly — details optional</span>
+  </button>
+
+  <div class="toast" id="toast">
+    <div class="toast-head">
+      <span>Logged <span class="time" id="toastTime"></span></span>
+      <button class="close-x" id="toastClose" aria-label="Dismiss">×</button>
+    </div>
+
+    <div class="field-label">Which side</div>
+    <div class="hip-wrap">
+      <svg width="180" height="120" viewBox="0 0 180 120">
+        <g class="hip-side" id="hipLeft">
+          <circle cx="60" cy="55" r="34" fill="#2C3A4B" stroke="#38485C" stroke-width="2"/>
+          <text x="60" y="60" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" fill="#9AA7B5">L</text>
+        </g>
+        <g class="hip-side" id="hipRight">
+          <circle cx="120" cy="55" r="34" fill="#2C3A4B" stroke="#38485C" stroke-width="2"/>
+          <text x="120" y="60" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" fill="#9AA7B5">R</text>
+        </g>
+        <rect x="70" y="30" width="40" height="50" rx="18" fill="#232E3D" stroke="#38485C" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <div class="field-label">Duration</div>
+    <div class="chip-row" id="durationChips">
+      <div class="chip" data-val="under 1 min">under 1 min</div>
+      <div class="chip" data-val="1–5 min">1–5 min</div>
+      <div class="chip" data-val="5–15 min">5–15 min</div>
+      <div class="chip" data-val="15+ min">15+ min</div>
+    </div>
+
+    <div class="field-label">Notes</div>
+    <textarea id="notesInput" placeholder="What were you doing, how bad, anything else"></textarea>
+
+    <button class="save-btn" id="saveDetails">Save details</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="statTotal">0</div><div class="l">total logged</div></div>
+    <div class="stat"><div class="n" id="statWeek">0</div><div class="l">last 7 days</div></div>
+    <div class="stat"><div class="n" id="statSide">–</div><div class="l">most common side</div></div>
+  </div>
+
+  <div class="section-head">
+    <h2>History</h2>
+    <div class="tools">
+      <button id="exportBtn">export</button>
+      <button id="importBtn">import</button>
+    </div>
+  </div>
+  <input type="file" id="importFile" accept="application/json">
+
+  <div id="list"></div>
+
+  <footer>stored only on this device, in this browser</footer>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'hipCatchLog_entries';
+  let entries = [];
+  let pendingId = null;
+  let pendingSide = new Set();
+
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      entries = raw ? JSON.parse(raw) : [];
+    }catch(e){
+      entries = [];
+    }
+  }
+  function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }
+
+  function fmtTime(iso){
+    const d = new Date(iso);
+    return d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  }
+  function fmtDay(iso){
+    const d = new Date(iso);
+    const today = new Date();
+    const yest = new Date(); yest.setDate(today.getDate()-1);
+    const sameDay = (a,b)=> a.toDateString()===b.toDateString();
+    if(sameDay(d, today)) return 'Today';
+    if(sameDay(d, yest)) return 'Yesterday';
+    return d.toLocaleDateString([], {weekday:'short', month:'short', day:'numeric'});
+  }
+
+  function renderStats(){
+    document.getElementById('statTotal').textContent = entries.length;
+    const weekAgo = Date.now() - 7*24*60*60*1000;
+    const weekCount = entries.filter(e => new Date(e.timestamp).getTime() >= weekAgo).length;
+    document.getElementById('statWeek').textContent = weekCount;
+    const counts = {L:0, R:0, Both:0};
+    entries.forEach(e => { if(e.side && counts[e.side] !== undefined) counts[e.side]++; });
+    let top = '–';
+    let max = 0;
+    Object.keys(counts).forEach(k => { if(counts[k] > max){ max = counts[k]; top = k; } });
+    document.getElementById('statSide').textContent = max > 0 ? top : '–';
+  }
+
+  function renderList(){
+    const list = document.getElementById('list');
+    list.innerHTML = '';
+    if(entries.length === 0){
+      list.innerHTML = '<div class="empty">No episodes logged yet. Tap the button above the moment it happens.</div>';
+      return;
+    }
+    const sorted = [...entries].sort((a,b)=> new Date(b.timestamp) - new Date(a.timestamp));
+    const groups = {};
+    sorted.forEach(e => {
+      const key = fmtDay(e.timestamp);
+      if(!groups[key]) groups[key] = [];
+      groups[key].push(e);
+    });
+    Object.keys(groups).forEach(dayKey => {
+      const dayDiv = document.createElement('div');
+      dayDiv.className = 'day-group';
+      const label = document.createElement('div');
+      label.className = 'day-label';
+      label.textContent = dayKey;
+      dayDiv.appendChild(label);
+      groups[dayKey].forEach(e => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        const metaBits = [];
+        if(e.side) metaBits.push(e.side);
+        if(e.duration) metaBits.push(e.duration);
+        div.innerHTML = `
+          <div class="entry-top">
+            <span class="entry-time">${fmtTime(e.timestamp)}</span>
+            <span class="entry-meta">${metaBits.join(' · ') || 'no details'}</span>
+          </div>
+          <div class="entry-detail">
+            ${e.notes ? `<div style="margin-bottom:8px;">${escapeHtml(e.notes)}</div>` : ''}
+            <button class="del" data-id="${e.id}">delete entry</button>
+          </div>
+        `;
+        div.addEventListener('click', (ev) => {
+          if(ev.target.classList.contains('del')) return;
+          div.classList.toggle('open');
+        });
+        dayDiv.appendChild(div);
+      });
+      list.appendChild(dayDiv);
+    });
+    list.querySelectorAll('.del').forEach(btn => {
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        entries = entries.filter(e => e.id !== id);
+        save();
+        renderList();
+        renderStats();
+      });
+    });
+  }
+
+  function escapeHtml(s){
+    const div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function logNow(){
+    const id = 'e' + Date.now() + Math.random().toString(36).slice(2,7);
+    const entry = { id, timestamp: new Date().toISOString(), side: null, duration: null, notes: null };
+    entries.push(entry);
+    save();
+    renderList();
+    renderStats();
+    openToast(entry);
+  }
+
+  function openToast(entry){
+    pendingId = entry.id;
+    pendingSide = new Set();
+    document.getElementById('toastTime').textContent = fmtTime(entry.timestamp);
+    document.getElementById('notesInput').value = '';
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    updateHipVisual();
+    document.getElementById('toast').classList.add('show');
+  }
+  function closeToast(){
+    document.getElementById('toast').classList.remove('show');
+    pendingId = null;
+  }
+
+  function updateHipVisual(){
+    const left = document.querySelector('#hipLeft circle');
+    const right = document.querySelector('#hipRight circle');
+    left.setAttribute('fill', pendingSide.has('L') ? '#7A3C3C' : '#2C3A4B');
+    left.setAttribute('stroke', pendingSide.has('L') ? '#E36B6B' : '#38485C');
+    right.setAttribute('fill', pendingSide.has('R') ? '#7A3C3C' : '#2C3A4B');
+    right.setAttribute('stroke', pendingSide.has('R') ? '#E36B6B' : '#38485C');
+  }
+
+  document.getElementById('logBtn').addEventListener('click', logNow);
+  document.getElementById('toastClose').addEventListener('click', closeToast);
+
+  document.getElementById('hipLeft').addEventListener('click', () => {
+    pendingSide.has('L') ? pendingSide.delete('L') : pendingSide.add('L');
+    updateHipVisual();
+  });
+  document.getElementById('hipRight').addEventListener('click', () => {
+    pendingSide.has('R') ? pendingSide.delete('R') : pendingSide.add('R');
+    updateHipVisual();
+  });
+
+  document.getElementById('durationChips').addEventListener('click', (ev) => {
+    const chip = ev.target.closest('.chip');
+    if(!chip) return;
+    document.querySelectorAll('#durationChips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  });
+
+  document.getElementById('saveDetails').addEventListener('click', () => {
+    if(!pendingId) return;
+    const entry = entries.find(e => e.id === pendingId);
+    if(!entry) return;
+    let side = null;
+    if(pendingSide.size === 2) side = 'Both';
+    else if(pendingSide.has('L')) side = 'L';
+    else if(pendingSide.has('R')) side = 'R';
+    entry.side = side;
+    const activeChip = document.querySelector('#durationChips .chip.active');
+    entry.duration = activeChip ? activeChip.getAttribute('data-val') : null;
+    const notes = document.getElementById('notesInput').value.trim();
+    entry.notes = notes || null;
+    save();
+    renderList();
+    renderStats();
+    closeToast();
+  });
+
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(entries, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'catch-log-export-' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('importBtn').addEventListener('click', () => {
+    document.getElementById('importFile').click();
+  });
+  document.getElementById('importFile').addEventListener('change', (ev) => {
+    const file = ev.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const imported = JSON.parse(reader.result);
+        if(Array.isArray(imported)){
+          const existingIds = new Set(entries.map(e => e.id));
+          imported.forEach(e => { if(e && e.id && !existingIds.has(e.id)) entries.push(e); });
+          save();
+          renderList();
+          renderStats();
+        }
+      }catch(e){}
+    };
+    reader.readAsText(file);
+    ev.target.value = '';
+  });
+
+  load();
+  renderList();
+  renderStats();
+})();
+</script>
+</body>
+</html>
