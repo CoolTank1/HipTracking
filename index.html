@@ -3,117 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<title>Catch Log</title>
+<title>BLT</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Catch Log">
-<meta name="theme-color" content="#1B2430">
+<meta name="apple-mobile-web-app-title" content="BLT">
+<meta name="theme-color" content="#FAF3EF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #1B2430;
-    --surface: #232E3D;
-    --surface-2: #2C3A4B;
-    --border: #38485C;
-    --text: #EDEFF2;
-    --text-dim: #9AA7B5;
-    --text-faint: #6B7889;
-    --coral: #E36B6B;
-    --coral-dim: #7A3C3C;
-    --teal: #5EC8B8;
-    --teal-dim: #2E5A54;
-    --radius: 14px;
+    --bg: #FBF4EF;
+    --bg-2: #F5E9E2;
+    --surface: #FFFFFF;
+    --border: #EEDDD3;
+    --text: #3E2C34;
+    --text-dim: #8A7A80;
+    --text-faint: #B7A9AE;
+    --rose: #D88C9A;
+    --rose-deep: #B8677A;
+    --rose-pale: #F7E3E7;
+    --sage: #8FAE96;
+    --sage-pale: #E6EFE7;
+    --gold: #E0A96D;
+    --gold-pale: #FBEEDD;
+    --radius: 20px;
+    --shadow: 0 10px 30px -12px rgba(184, 103, 122, 0.22);
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
   html,body{
-    margin:0; padding:0; background:var(--bg); color:var(--text);
+    margin:0; padding:0;
+    background: radial-gradient(circle at 20% -10%, #FDF0EA 0%, var(--bg) 45%, var(--bg-2) 100%);
+    color:var(--text);
     font-family:'Inter',system-ui,sans-serif;
     min-height:100dvh;
     overscroll-behavior-y: none;
   }
   body{
-    padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+    padding: max(22px, env(safe-area-inset-top)) 20px max(30px, env(safe-area-inset-bottom));
     max-width: 480px; margin: 0 auto;
   }
   .eyebrow{
     font-family:'IBM Plex Mono', monospace;
     font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--text-faint); margin: 0 0 2px;
+    color: var(--rose-deep); margin: 0 0 4px; font-weight: 500;
   }
   h1{
-    font-family:'Fraunces', serif; font-weight: 500; font-size: 28px;
-    margin: 0 0 22px; letter-spacing: -0.01em;
+    font-family:'Fraunces', serif; font-weight: 600; font-size: 32px;
+    margin: 0 0 22px; letter-spacing: -0.01em; color: var(--text);
   }
+
+  /* streak card */
+  .streak-card{
+    background: linear-gradient(155deg, #FFFFFF 0%, var(--rose-pale) 130%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    display:flex; align-items:center; gap:16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .streak-flame{
+    font-size: 34px; line-height:1; filter: drop-shadow(0 2px 4px rgba(224,169,109,.35));
+  }
+  .streak-num{
+    font-family:'Fraunces', serif; font-weight: 700; font-size: 34px; color: var(--rose-deep);
+    line-height: 1;
+  }
+  .streak-label{
+    font-size: 12.5px; color: var(--text-dim); margin-top: 3px; font-weight: 500;
+  }
+  .streak-best{
+    margin-left:auto; text-align:right;
+  }
+  .streak-best .n{ font-family:'IBM Plex Mono', monospace; font-size: 16px; color: var(--gold); }
+  .streak-best .l{ font-size: 10.5px; color: var(--text-faint); text-transform:uppercase; letter-spacing:.06em; margin-top:2px; }
+
   .log-btn{
-    width: 100%; border: none; border-radius: 20px;
-    background: linear-gradient(180deg, #E88080, var(--coral));
-    color: #3A1414; font-family:'Fraunces', serif; font-weight: 600;
+    width: 100%; border: none; border-radius: 24px;
+    background: linear-gradient(180deg, #E7A3AF, var(--rose-deep));
+    color: #fff; font-family:'Fraunces', serif; font-weight: 600;
     font-size: 22px; padding: 30px 0; cursor: pointer;
     display:flex; flex-direction:column; align-items:center; gap:6px;
     transition: transform .08s ease;
+    box-shadow: 0 14px 30px -10px rgba(184,103,122,0.45);
   }
   .log-btn:active{ transform: scale(0.97); }
   .log-btn .sub{
     font-family:'Inter',sans-serif; font-weight:500; font-size:12.5px;
-    color: #4A1E1E; opacity: .75; letter-spacing: 0.01em;
+    color: #fff; opacity: .85; letter-spacing: 0.01em;
   }
+
+  /* quote banner */
+  .quote-banner{
+    display:none;
+    margin-top: 16px;
+    background: linear-gradient(155deg, var(--gold-pale), #FFFDF9);
+    border: 1px solid #F0DDBB;
+    border-radius: var(--radius);
+    padding: 22px 22px 20px;
+    text-align:center;
+    box-shadow: var(--shadow);
+  }
+  .quote-banner.show{ display:block; animation: fadeUp .4s ease; }
+  @keyframes fadeUp{ from{ opacity:0; transform: translateY(8px);} to{ opacity:1; transform: translateY(0);} }
+  .quote-mark{ font-family:'Fraunces', serif; font-size: 30px; color: var(--gold); line-height:.4; }
+  .quote-text{
+    font-family:'Fraunces', serif; font-weight: 500; font-size: 22px; line-height: 1.35;
+    color: #6B4B2A; margin: 10px 0 4px; letter-spacing: -0.01em;
+  }
+
   .toast{
     margin-top: 14px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 16px 16px 18px; display: none;
+    border-radius: var(--radius); padding: 18px 18px 20px; display: none;
+    box-shadow: var(--shadow);
   }
-  .toast.show{ display:block; }
+  .toast.show{ display:block; animation: fadeUp .3s ease; }
   .toast-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
   .toast-head span{ font-size: 13px; color: var(--text-dim); }
-  .toast-head .time{ font-family:'IBM Plex Mono', monospace; color: var(--teal); font-size:13px; }
+  .toast-head .time{ font-family:'IBM Plex Mono', monospace; color: var(--rose-deep); font-size:13px; }
   .close-x{
-    background:none; border:none; color:var(--text-faint); font-size:18px;
+    background:none; border:none; color:var(--text-faint); font-size:20px;
     cursor:pointer; line-height:1; padding:4px;
   }
-  .field-label{ font-size: 12.5px; color: var(--text-dim); margin: 14px 0 8px; }
+  .field-label{ font-size: 12.5px; color: var(--text-dim); margin: 14px 0 8px; font-weight:500; }
   .field-label:first-of-type{ margin-top:0; }
   .hip-wrap{ display:flex; justify-content:center; padding: 4px 0 2px; }
   .hip-side{ cursor:pointer; transition: opacity .15s; }
   .hip-side rect, .hip-side circle{ transition: fill .15s, stroke .15s; }
   .chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
   .chip{
-    border: 1px solid var(--border); background: var(--surface-2); color: var(--text-dim);
+    border: 1px solid var(--border); background: var(--bg); color: var(--text-dim);
     border-radius: 999px; padding: 8px 14px; font-size: 13px; cursor:pointer;
     font-family:'Inter',sans-serif;
   }
-  .chip.active{ background: var(--teal-dim); border-color: var(--teal); color: var(--teal); }
+  .chip.active{ background: var(--sage-pale); border-color: var(--sage); color: #3D5C43; }
   textarea{
-    width:100%; background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: 10px; color: var(--text); padding: 10px 12px; font-family:'Inter',sans-serif;
+    width:100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 12px; color: var(--text); padding: 10px 12px; font-family:'Inter',sans-serif;
     font-size: 14px; resize: vertical; min-height: 54px;
   }
   textarea::placeholder{ color: var(--text-faint); }
   .save-btn{
-    width:100%; margin-top:16px; background: var(--teal); border:none; border-radius:10px;
-    color:#0E332C; font-weight:600; font-size:14px; padding:12px 0; cursor:pointer;
+    width:100%; margin-top:16px; background: var(--sage); border:none; border-radius:12px;
+    color:#fff; font-weight:600; font-size:14px; padding:12px 0; cursor:pointer;
     font-family:'Inter',sans-serif;
   }
   .stats{ display:flex; gap:10px; margin: 22px 0 8px; }
   .stat{
-    flex:1; background: var(--surface); border:1px solid var(--border); border-radius: 12px;
-    padding: 12px 14px;
+    flex:1; background: var(--surface); border:1px solid var(--border); border-radius: 14px;
+    padding: 12px 14px; box-shadow: 0 6px 16px -10px rgba(184,103,122,0.25);
   }
-  .stat .n{ font-family:'IBM Plex Mono', monospace; font-size:20px; color:var(--text); }
+  .stat .n{ font-family:'IBM Plex Mono', monospace; font-size:19px; color:var(--text); }
   .stat .l{ font-size: 11px; color: var(--text-faint); margin-top:2px; }
   .section-head{ display:flex; justify-content:space-between; align-items:baseline; margin: 26px 0 10px; }
   .section-head h2{
-    font-family:'Fraunces', serif; font-weight:500; font-size:16px; margin:0; color:var(--text);
+    font-family:'Fraunces', serif; font-weight:600; font-size:17px; margin:0; color:var(--text);
   }
   .tools{ display:flex; gap:14px; }
   .tools button{
-    background:none; border:none; color: var(--text-faint); font-size:12px;
+    background:none; border:none; color: var(--rose-deep); font-size:12px;
     font-family:'IBM Plex Mono', monospace; cursor:pointer; padding:0;
   }
-  .tools button:hover{ color: var(--text-dim); }
   .empty{
     text-align:center; color: var(--text-faint); font-size: 13.5px; padding: 40px 10px;
-    border: 1px dashed var(--border); border-radius: var(--radius);
+    border: 1px dashed var(--border); border-radius: var(--radius); background: var(--surface);
   }
   .day-group{ margin-bottom: 18px; }
   .day-label{
@@ -121,8 +175,9 @@
     text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
   }
   .entry{
-    background: var(--surface); border:1px solid var(--border); border-radius: 12px;
+    background: var(--surface); border:1px solid var(--border); border-radius: 14px;
     padding: 12px 14px; margin-bottom: 8px; cursor:pointer;
+    box-shadow: 0 6px 16px -12px rgba(184,103,122,0.2);
   }
   .entry-top{ display:flex; justify-content:space-between; align-items:center; }
   .entry-time{ font-family:'IBM Plex Mono', monospace; font-size: 14px; color: var(--text); }
@@ -130,7 +185,12 @@
   .entry-detail{ margin-top: 8px; font-size: 13px; color: var(--text-dim); display:none; }
   .entry.open .entry-detail{ display:block; }
   .del{
-    color: var(--coral); background:none; border:none; font-size:12px; margin-top:10px;
+    color: var(--rose-deep); background:none; border:none; font-size:12px; margin-top:10px;
+    cursor:pointer; font-family:'IBM Plex Mono', monospace; padding:0;
+  }
+  .edit{
+    color: var(--sage); background:none; border:none; font-size:12px; margin-top:10px;
+    margin-right: 16px;
     cursor:pointer; font-family:'IBM Plex Mono', monospace; padding:0;
   }
   footer{
@@ -142,17 +202,33 @@
 </head>
 <body>
 
-  <p class="eyebrow">Bilateral hip · episode tracker</p>
-  <h1>Catch log</h1>
+  <p class="eyebrow">Bilateral Labrum Tear · episode tracker</p>
+  <h1>BLT</h1>
+
+  <div class="streak-card">
+    <div class="streak-flame">🔥</div>
+    <div>
+      <div class="streak-num" id="streakNum">0</div>
+      <div class="streak-label" id="streakLabel">days since last catch</div>
+    </div>
+    <div class="streak-best">
+      <div class="n" id="streakBest">0</div>
+      <div class="l">best streak</div>
+    </div>
+  </div>
 
   <button class="log-btn" id="logBtn">
     Log it now
-    <span class="sub">Saves instantly — details optional</span>
   </button>
+
+  <div class="quote-banner" id="quoteBanner">
+    <div class="quote-mark">“</div>
+    <div class="quote-text" id="quoteText"></div>
+  </div>
 
   <div class="toast" id="toast">
     <div class="toast-head">
-      <span>Logged <span class="time" id="toastTime"></span></span>
+      <span><span id="toastLabel">Logged</span> <span class="time" id="toastTime"></span></span>
       <button class="close-x" id="toastClose" aria-label="Dismiss">×</button>
     </div>
 
@@ -160,14 +236,14 @@
     <div class="hip-wrap">
       <svg width="180" height="120" viewBox="0 0 180 120">
         <g class="hip-side" id="hipLeft">
-          <circle cx="60" cy="55" r="34" fill="#2C3A4B" stroke="#38485C" stroke-width="2"/>
-          <text x="60" y="60" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" fill="#9AA7B5">L</text>
+          <circle cx="60" cy="55" r="34" fill="#F5E9E2" stroke="#EEDDD3" stroke-width="2"/>
+          <text x="60" y="60" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" fill="#8A7A80">L</text>
         </g>
         <g class="hip-side" id="hipRight">
-          <circle cx="120" cy="55" r="34" fill="#2C3A4B" stroke="#38485C" stroke-width="2"/>
-          <text x="120" y="60" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" fill="#9AA7B5">R</text>
+          <circle cx="120" cy="55" r="34" fill="#F5E9E2" stroke="#EEDDD3" stroke-width="2"/>
+          <text x="120" y="60" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" fill="#8A7A80">R</text>
         </g>
-        <rect x="70" y="30" width="40" height="50" rx="18" fill="#232E3D" stroke="#38485C" stroke-width="2"/>
+        <rect x="70" y="30" width="40" height="50" rx="18" fill="#FFFFFF" stroke="#EEDDD3" stroke-width="2"/>
       </svg>
     </div>
 
@@ -207,21 +283,35 @@
 <script>
 (function(){
   const STORAGE_KEY = 'hipCatchLog_entries';
+  const META_KEY = 'hipCatchLog_meta'; // { firstUse, bestStreak }
   let entries = [];
+  let meta = { firstUse: null, bestStreak: 0 };
   let pendingId = null;
   let pendingSide = new Set();
+
+  // ---- fill your quotes in here, comma-separated, each wrapped in quotes ----
+  const QUOTES = [
+
+  ];
+  // ---------------------------------------------------------------------------
 
   function load(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
       entries = raw ? JSON.parse(raw) : [];
-    }catch(e){
-      entries = [];
-    }
+    }catch(e){ entries = []; }
+    try{
+      const rawMeta = localStorage.getItem(META_KEY);
+      meta = rawMeta ? JSON.parse(rawMeta) : { firstUse: new Date().toISOString(), bestStreak: 0 };
+    }catch(e){ meta = { firstUse: new Date().toISOString(), bestStreak: 0 }; }
+    if(!meta.firstUse) meta.firstUse = new Date().toISOString();
+    saveMeta();
   }
-  function save(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  }
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }
+  function saveMeta(){ localStorage.setItem(META_KEY, JSON.stringify(meta)); }
+
+  function startOfDay(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
+  function daysBetween(a,b){ return Math.round((startOfDay(b) - startOfDay(a)) / 86400000); }
 
   function fmtTime(iso){
     const d = new Date(iso);
@@ -237,17 +327,46 @@
     return d.toLocaleDateString([], {weekday:'short', month:'short', day:'numeric'});
   }
 
+  function currentStreak(){
+    const today = new Date();
+    let lastIncident = null;
+    entries.forEach(e => {
+      const t = new Date(e.timestamp);
+      if(!lastIncident || t > lastIncident) lastIncident = t;
+    });
+    const baseline = lastIncident || new Date(meta.firstUse);
+    let streak = daysBetween(baseline, today);
+    if(streak < 0) streak = 0;
+    return streak;
+  }
+
+  function renderStreak(){
+    const streak = currentStreak();
+    document.getElementById('streakNum').textContent = streak;
+    document.getElementById('streakLabel').textContent = streak === 1 ? 'day since last catch' : 'days since last catch';
+    if(streak > (meta.bestStreak || 0)){
+      meta.bestStreak = streak;
+      saveMeta();
+    }
+    document.getElementById('streakBest').textContent = meta.bestStreak || 0;
+  }
+
   function renderStats(){
     document.getElementById('statTotal').textContent = entries.length;
     const weekAgo = Date.now() - 7*24*60*60*1000;
     const weekCount = entries.filter(e => new Date(e.timestamp).getTime() >= weekAgo).length;
     document.getElementById('statWeek').textContent = weekCount;
-    const counts = {L:0, R:0, Both:0};
-    entries.forEach(e => { if(e.side && counts[e.side] !== undefined) counts[e.side]++; });
-    let top = '–';
-    let max = 0;
-    Object.keys(counts).forEach(k => { if(counts[k] > max){ max = counts[k]; top = k; } });
-    document.getElementById('statSide').textContent = max > 0 ? top : '–';
+    const counts = {L:0, R:0};
+    entries.forEach(e => {
+      if(e.side === 'L') counts.L++;
+      else if(e.side === 'R') counts.R++;
+      else if(e.side === 'Both'){ counts.L++; counts.R++; }
+    });
+    let sideText = '–';
+    if(counts.L > 0 || counts.R > 0){
+      sideText = counts.L === counts.R ? 'Even' : (counts.L > counts.R ? 'L' : 'R');
+    }
+    document.getElementById('statSide').textContent = sideText;
   }
 
   function renderList(){
@@ -284,6 +403,7 @@
           </div>
           <div class="entry-detail">
             ${e.notes ? `<div style="margin-bottom:8px;">${escapeHtml(e.notes)}</div>` : ''}
+            <button class="edit" data-id="${e.id}">edit entry</button>
             <button class="del" data-id="${e.id}">delete entry</button>
           </div>
         `;
@@ -303,6 +423,15 @@
         save();
         renderList();
         renderStats();
+        renderStreak();
+      });
+    });
+    list.querySelectorAll('.edit').forEach(btn => {
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        const entry = entries.find(e => e.id === id);
+        if(entry) openEditor(entry);
       });
     });
   }
@@ -313,6 +442,16 @@
     return div.innerHTML;
   }
 
+  function showQuote(){
+    const banner = document.getElementById('quoteBanner');
+    if(QUOTES.length === 0){ banner.classList.remove('show'); return; }
+    const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    document.getElementById('quoteText').textContent = q;
+    banner.classList.remove('show');
+    void banner.offsetWidth;
+    banner.classList.add('show');
+  }
+
   function logNow(){
     const id = 'e' + Date.now() + Math.random().toString(36).slice(2,7);
     const entry = { id, timestamp: new Date().toISOString(), side: null, duration: null, notes: null };
@@ -320,18 +459,43 @@
     save();
     renderList();
     renderStats();
+    renderStreak();
+    showQuote();
     openToast(entry);
   }
 
   function openToast(entry){
     pendingId = entry.id;
     pendingSide = new Set();
+    document.getElementById('toastLabel').textContent = 'Logged';
     document.getElementById('toastTime').textContent = fmtTime(entry.timestamp);
     document.getElementById('notesInput').value = '';
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     updateHipVisual();
     document.getElementById('toast').classList.add('show');
   }
+
+  function openEditor(entry){
+    pendingId = entry.id;
+    pendingSide = new Set();
+    if(entry.side === 'Both'){ pendingSide.add('L'); pendingSide.add('R'); }
+    else if(entry.side === 'L'){ pendingSide.add('L'); }
+    else if(entry.side === 'R'){ pendingSide.add('R'); }
+
+    document.getElementById('toastLabel').textContent = 'Editing entry from';
+    document.getElementById('toastTime').textContent = fmtTime(entry.timestamp);
+    document.getElementById('notesInput').value = entry.notes || '';
+
+    document.querySelectorAll('#durationChips .chip').forEach(c => {
+      c.classList.toggle('active', c.getAttribute('data-val') === entry.duration);
+    });
+
+    updateHipVisual();
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    toast.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   function closeToast(){
     document.getElementById('toast').classList.remove('show');
     pendingId = null;
@@ -340,10 +504,10 @@
   function updateHipVisual(){
     const left = document.querySelector('#hipLeft circle');
     const right = document.querySelector('#hipRight circle');
-    left.setAttribute('fill', pendingSide.has('L') ? '#7A3C3C' : '#2C3A4B');
-    left.setAttribute('stroke', pendingSide.has('L') ? '#E36B6B' : '#38485C');
-    right.setAttribute('fill', pendingSide.has('R') ? '#7A3C3C' : '#2C3A4B');
-    right.setAttribute('stroke', pendingSide.has('R') ? '#E36B6B' : '#38485C');
+    left.setAttribute('fill', pendingSide.has('L') ? '#F7E3E7' : '#F5E9E2');
+    left.setAttribute('stroke', pendingSide.has('L') ? '#D88C9A' : '#EEDDD3');
+    right.setAttribute('fill', pendingSide.has('R') ? '#F7E3E7' : '#F5E9E2');
+    right.setAttribute('stroke', pendingSide.has('R') ? '#D88C9A' : '#EEDDD3');
   }
 
   document.getElementById('logBtn').addEventListener('click', logNow);
@@ -412,6 +576,7 @@
           save();
           renderList();
           renderStats();
+          renderStreak();
         }
       }catch(e){}
     };
@@ -422,6 +587,7 @@
   load();
   renderList();
   renderStats();
+  renderStreak();
 })();
 </script>
 </body>
