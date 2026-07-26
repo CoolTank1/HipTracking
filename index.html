@@ -1,647 +1,1340 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<title>BLT</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="BLT">
-<meta name="theme-color" content="#FAF3EF">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
+<title>My Semester</title>
+<link rel="icon" href="data:,">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="My Semester" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="theme-color" content="#faf3eb" />
+
+<!-- Tailwind (utility classes used throughout the component) -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Import map: load React, ReactDOM, and lucide-react straight from esm.sh, no build step -->
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.383.0?external=react"
+  }
+}
+</script>
+
+<!-- Babel standalone: transforms the JSX below, in the browser, at load time -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
 <style>
-  :root{
-    --bg: #FBF4EF;
-    --bg-2: #F5E9E2;
-    --surface: #FFFFFF;
-    --border: #EEDDD3;
-    --text: #3E2C34;
-    --text-dim: #8A7A80;
-    --text-faint: #B7A9AE;
-    --rose: #D88C9A;
-    --rose-deep: #B8677A;
-    --rose-pale: #F7E3E7;
-    --sage: #8FAE96;
-    --sage-pale: #E6EFE7;
-    --gold: #E0A96D;
-    --gold-pale: #FBEEDD;
-    --radius: 20px;
-    --shadow: 0 10px 30px -12px rgba(184, 103, 122, 0.22);
-  }
-  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
-  html,body{
-    margin:0; padding:0;
-    background: radial-gradient(circle at 20% -10%, #FDF0EA 0%, var(--bg) 45%, var(--bg-2) 100%);
-    color:var(--text);
-    font-family:'Inter',system-ui,sans-serif;
-    min-height:100dvh;
-    overscroll-behavior-y: none;
-  }
-  body{
-    padding: max(22px, env(safe-area-inset-top)) 20px max(30px, env(safe-area-inset-bottom));
-    max-width: 480px; margin: 0 auto;
-  }
-  .eyebrow{
-    font-family:'IBM Plex Mono', monospace;
-    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--rose-deep); margin: 0 0 4px; font-weight: 500;
-  }
-  h1{
-    font-family:'Fraunces', serif; font-weight: 600; font-size: 32px;
-    margin: 0 0 22px; letter-spacing: -0.01em; color: var(--text);
-  }
-
-  /* streak card */
-  .streak-card{
-    background: linear-gradient(155deg, #FFFFFF 0%, var(--rose-pale) 130%);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 22px;
-    display:flex; align-items:center; gap:16px;
-    box-shadow: var(--shadow);
-    margin-bottom: 16px;
-  }
-  .streak-flame{
-    font-size: 34px; line-height:1; filter: drop-shadow(0 2px 4px rgba(224,169,109,.35));
-  }
-  .streak-num{
-    font-family:'Fraunces', serif; font-weight: 700; font-size: 34px; color: var(--rose-deep);
-    line-height: 1;
-  }
-  .streak-label{
-    font-size: 12.5px; color: var(--text-dim); margin-top: 3px; font-weight: 500;
-  }
-  .streak-best{
-    margin-left:auto; text-align:right;
-  }
-  .streak-best .n{ font-family:'IBM Plex Mono', monospace; font-size: 16px; color: var(--gold); }
-  .streak-best .l{ font-size: 10.5px; color: var(--text-faint); text-transform:uppercase; letter-spacing:.06em; margin-top:2px; }
-
-  .log-btn{
-    width: 100%; border: none; border-radius: 24px;
-    background: linear-gradient(180deg, #E7A3AF, var(--rose-deep));
-    color: #fff; font-family:'Fraunces', serif; font-weight: 600;
-    font-size: 22px; padding: 30px 0; cursor: pointer;
-    display:flex; flex-direction:column; align-items:center; gap:6px;
-    transition: transform .08s ease;
-    box-shadow: 0 14px 30px -10px rgba(184,103,122,0.45);
-  }
-  .log-btn:active{ transform: scale(0.97); }
-  .log-btn .sub{
-    font-family:'Inter',sans-serif; font-weight:500; font-size:12.5px;
-    color: #fff; opacity: .85; letter-spacing: 0.01em;
-  }
-
-  /* quote banner */
-  .quote-banner{
-    display:none;
-    margin-top: 16px;
-    background: linear-gradient(155deg, var(--gold-pale), #FFFDF9);
-    border: 1px solid #F0DDBB;
-    border-radius: var(--radius);
-    padding: 22px 22px 20px;
-    text-align:center;
-    box-shadow: var(--shadow);
-  }
-  .quote-banner.show{ display:block; animation: fadeUp .4s ease; }
-  @keyframes fadeUp{ from{ opacity:0; transform: translateY(8px);} to{ opacity:1; transform: translateY(0);} }
-  .quote-mark{ font-family:'Fraunces', serif; font-size: 30px; color: var(--gold); line-height:.4; }
-  .quote-text{
-    font-family:'Fraunces', serif; font-weight: 500; font-size: 22px; line-height: 1.35;
-    color: #6B4B2A; margin: 10px 0 4px; letter-spacing: -0.01em;
-  }
-
-  .toast{
-    margin-top: 14px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 18px 18px 20px; display: none;
-    box-shadow: var(--shadow);
-  }
-  .toast.show{ display:block; animation: fadeUp .3s ease; }
-  .toast-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-  .toast-head span{ font-size: 13px; color: var(--text-dim); }
-  .toast-head .time{ font-family:'IBM Plex Mono', monospace; color: var(--rose-deep); font-size:13px; }
-  .close-x{
-    background:none; border:none; color:var(--text-faint); font-size:20px;
-    cursor:pointer; line-height:1; padding:4px;
-  }
-  .field-label{ font-size: 12.5px; color: var(--text-dim); margin: 14px 0 8px; font-weight:500; }
-  .field-label:first-of-type{ margin-top:0; }
-  .hip-wrap{ display:flex; justify-content:center; padding: 4px 0 2px; }
-  .hip-side{ cursor:pointer; transition: opacity .15s; }
-  .hip-side rect, .hip-side circle{ transition: fill .15s, stroke .15s; }
-  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
-  .chip{
-    border: 1px solid var(--border); background: var(--bg); color: var(--text-dim);
-    border-radius: 999px; padding: 8px 14px; font-size: 13px; cursor:pointer;
-    font-family:'Inter',sans-serif;
-  }
-  .chip.active{ background: var(--sage-pale); border-color: var(--sage); color: #3D5C43; }
-  textarea{
-    width:100%; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 12px; color: var(--text); padding: 10px 12px; font-family:'Inter',sans-serif;
-    font-size: 14px; resize: vertical; min-height: 54px;
-  }
-  textarea::placeholder{ color: var(--text-faint); }
-  .save-btn{
-    width:100%; margin-top:16px; background: var(--sage); border:none; border-radius:12px;
-    color:#fff; font-weight:600; font-size:14px; padding:12px 0; cursor:pointer;
-    font-family:'Inter',sans-serif;
-  }
-  .stats{ display:flex; gap:10px; margin: 22px 0 8px; }
-  .stat{
-    flex:1; background: var(--surface); border:1px solid var(--border); border-radius: 14px;
-    padding: 12px 14px; box-shadow: 0 6px 16px -10px rgba(184,103,122,0.25);
-  }
-  .stat .n{ font-family:'IBM Plex Mono', monospace; font-size:19px; color:var(--text); }
-  .stat .l{ font-size: 11px; color: var(--text-faint); margin-top:2px; }
-  .section-head{ display:flex; justify-content:space-between; align-items:baseline; margin: 26px 0 10px; }
-  .section-head h2{
-    font-family:'Fraunces', serif; font-weight:600; font-size:17px; margin:0; color:var(--text);
-  }
-  .tools{ display:flex; gap:14px; }
-  .tools button{
-    background:none; border:none; color: var(--rose-deep); font-size:12px;
-    font-family:'IBM Plex Mono', monospace; cursor:pointer; padding:0;
-  }
-  .empty{
-    text-align:center; color: var(--text-faint); font-size: 13.5px; padding: 40px 10px;
-    border: 1px dashed var(--border); border-radius: var(--radius); background: var(--surface);
-  }
-  .day-group{ margin-bottom: 18px; }
-  .day-label{
-    font-family:'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-faint);
-    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
-  }
-  .entry{
-    background: var(--surface); border:1px solid var(--border); border-radius: 14px;
-    padding: 12px 14px; margin-bottom: 8px; cursor:pointer;
-    box-shadow: 0 6px 16px -12px rgba(184,103,122,0.2);
-  }
-  .entry-top{ display:flex; justify-content:space-between; align-items:center; }
-  .entry-time{ font-family:'IBM Plex Mono', monospace; font-size: 14px; color: var(--text); }
-  .entry-meta{ font-size: 12px; color: var(--text-faint); }
-  .entry-detail{ margin-top: 8px; font-size: 13px; color: var(--text-dim); display:none; }
-  .entry.open .entry-detail{ display:block; }
-  .del{
-    color: var(--rose-deep); background:none; border:none; font-size:12px; margin-top:10px;
-    cursor:pointer; font-family:'IBM Plex Mono', monospace; padding:0;
-  }
-  .edit{
-    color: var(--sage); background:none; border:none; font-size:12px; margin-top:10px;
-    margin-right: 16px;
-    cursor:pointer; font-family:'IBM Plex Mono', monospace; padding:0;
-  }
-  footer{
-    text-align:center; color: var(--text-faint); font-size: 11px; margin: 30px 0 10px;
-    font-family:'IBM Plex Mono', monospace;
-  }
-  #importFile{ display:none; }
+  html, body { margin: 0; padding: 0; background: #faf3eb; }
+  #root { min-height: 100vh; }
 </style>
 </head>
 <body>
+<div id="root"></div>
 
-  <p class="eyebrow">Bilateral Labrum Tear · episode tracker</p>
-  <h1>BLT</h1>
+<script type="text/babel" data-type="module" data-presets="react">
+import React from "react";
+import ReactDOM from "react-dom/client";
 
-  <div class="streak-card">
-    <div class="streak-flame">🔥</div>
-    <div>
-      <div class="streak-num" id="streakNum">0</div>
-      <div class="streak-label" id="streakLabel">days since last catch</div>
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import {
+  ChevronLeft, ChevronRight, Plus, X, Trash2, Pin, Heart,
+  BookOpen, PartyPopper, Plane, Cake, CalendarDays,
+  Settings2, Minus, Check, MapPin, Clock
+} from "lucide-react";
+
+// ---------- Palettes ----------
+const CLASS_PALETTE = [
+  { name: "Terracotta", value: "#C7A491" },
+  { name: "Sage", value: "#9BA893" },
+  { name: "Blush", value: "#D9A79E" },
+  { name: "Stone", value: "#9AA0A8" },
+  { name: "Olive", value: "#A8A177" },
+  { name: "Rose", value: "#B98C8C" },
+  { name: "Sand", value: "#C9B48A" },
+  { name: "Clay", value: "#B08768" },
+];
+
+const CATEGORY = {
+  event: { label: "Event", color: "#8FA3A8", icon: CalendarDays },
+  birthday: { label: "Birthday", color: "#C79BAE", icon: Cake },
+  trip: { label: "Trip", color: "#9BAE94", icon: Plane },
+};
+
+const ASSIGN_TYPE = {
+  assignment: { label: "Assignment" },
+  test: { label: "Test" },
+  project: { label: "Project" },
+};
+
+function SegmentedControl({ options, value, onChange, fullWidth }) {
+  return (
+    <div
+      className={`inline-flex items-center rounded-full p-1 gap-0.5 ${fullWidth ? "w-full" : ""}`}
+      style={{ background: "#EECFCA" }}
+      role="tablist"
+    >
+      {options.map((opt) => {
+        const active = value === opt.value;
+        return (
+          <button
+            key={opt.value}
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(opt.value)}
+            className={`px-4 py-2 rounded-full font-medium ${fullWidth ? "flex-1" : ""}`}
+            style={{
+              fontSize: "0.85em",
+              background: active ? "#FFFFFF" : "transparent",
+              color: active ? "#6B5142" : "#96897E",
+              boxShadow: active ? "0 1px 4px rgba(91,79,71,0.16)" : "none",
+              transition: "all .15s ease",
+            }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
     </div>
-    <div class="streak-best">
-      <div class="n" id="streakBest">0</div>
-      <div class="l">best streak</div>
-    </div>
-  </div>
+  );
+}
 
-  <button class="log-btn" id="logBtn">
-    Log it now
-  </button>
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-  <div class="quote-banner" id="quoteBanner">
-    <div class="quote-mark">“</div>
-    <div class="quote-text" id="quoteText"></div>
-  </div>
+const pad = (n) => String(n).padStart(2, "0");
+const toISO = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const uid = () => Math.random().toString(36).slice(2, 10);
 
-  <div class="toast" id="toast">
-    <div class="toast-head">
-      <span><span id="toastLabel">Logged</span> <span class="time" id="toastTime"></span></span>
-      <button class="close-x" id="toastClose" aria-label="Dismiss">×</button>
-    </div>
+function seedData() {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  const classId1 = uid(), classId2 = uid();
+  return {
+    classes: [
+      { id: classId1, name: "Intro Psych", color: CLASS_PALETTE[2].value, location: "PAIS 290", schedule: [
+        { day: 2, startTime: "10:00", endTime: "11:15" },
+        { day: 4, startTime: "10:00", endTime: "11:15" },
+      ] },
+      { id: classId2, name: "Calculus I", color: CLASS_PALETTE[0].value, location: "MSC 130", schedule: [
+        { day: 1, startTime: "09:00", endTime: "09:50" },
+        { day: 3, startTime: "09:00", endTime: "09:50" },
+        { day: 5, startTime: "09:00", endTime: "09:20" },
+      ] },
+    ],
+    events: [
+      { id: uid(), title: "Move-in Day", date: toISO(new Date(y, m, 3)), category: "event", notes: "Bring the fan!" },
+      { id: uid(), title: "Sam's Birthday", date: toISO(new Date(y, m, 14)), category: "birthday", notes: "" },
+      { id: uid(), title: "Weekend trip home", date: toISO(new Date(y, m, 22)), category: "trip", notes: "" },
+    ],
+    assignments: [
+      { id: uid(), title: "Problem Set 2", classId: classId2, type: "assignment", dueDate: toISO(new Date(y, m, 10)), completed: false },
+      { id: uid(), title: "Midterm 1", classId: classId1, type: "test", dueDate: toISO(new Date(y, m, 18)), completed: false },
+    ],
+    todos: [
+      { id: uid(), title: "Order textbooks", dueDate: toISO(new Date(y, m, 5)), completed: false },
+      { id: uid(), title: "Call about housing form", dueDate: null, completed: false },
+    ],
+  };
+}
 
-    <div class="field-label">Which side</div>
-    <div class="hip-wrap">
-      <svg width="180" height="120" viewBox="0 0 180 120">
-        <g class="hip-side" id="hipLeft">
-          <circle cx="60" cy="55" r="34" fill="#F5E9E2" stroke="#EEDDD3" stroke-width="2"/>
-          <text x="60" y="60" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" fill="#8A7A80">L</text>
-        </g>
-        <g class="hip-side" id="hipRight">
-          <circle cx="120" cy="55" r="34" fill="#F5E9E2" stroke="#EEDDD3" stroke-width="2"/>
-          <text x="120" y="60" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" fill="#8A7A80">R</text>
-        </g>
-        <rect x="70" y="30" width="40" height="50" rx="18" fill="#FFFFFF" stroke="#EEDDD3" stroke-width="2"/>
-      </svg>
-    </div>
+function CollegeCalendar() {
+  const [classes, setClasses] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [assignments, setAssignments] = useState([]);
+  const [todos, setTodos] = useState([]);
+  const [loaded, setLoaded] = useState(false);
 
-    <div class="field-label">Duration</div>
-    <div class="chip-row" id="durationChips">
-      <div class="chip" data-val="under 1 min">under 1 min</div>
-      <div class="chip" data-val="1–5 min">1–5 min</div>
-      <div class="chip" data-val="5–15 min">5–15 min</div>
-      <div class="chip" data-val="15+ min">15+ min</div>
-    </div>
+  const [page, setPage] = useState("calendar"); // 'calendar' | 'assignments' | 'todo'
+  const [view, setView] = useState("month"); // 'month' | 'week'
+  const [cursor, setCursor] = useState(new Date());
+  const [scale, setScale] = useState(1.1); // font scale, large print default
+  const [selectedDate, setSelectedDate] = useState(null); // ISO string
+  const [addOpen, setAddOpen] = useState(false);
+  const [addTab, setAddTab] = useState("class");
+  const [manageOpen, setManageOpen] = useState(false);
+  const [prefillDate, setPrefillDate] = useState(null);
 
-    <div class="field-label">Notes</div>
-    <textarea id="notesInput" placeholder="What were you doing, how bad, anything else"></textarea>
-
-    <button class="save-btn" id="saveDetails">Save details</button>
-  </div>
-
-  <div class="stats">
-    <div class="stat"><div class="n" id="statTotal">0</div><div class="l">total logged</div></div>
-    <div class="stat"><div class="n" id="statWeek">0</div><div class="l">last 7 days</div></div>
-    <div class="stat"><div class="n" id="statSide">–</div><div class="l">most common side</div></div>
-  </div>
-
-  <div class="section-head">
-    <h2>History</h2>
-    <div class="tools">
-      <button id="exportBtn">export</button>
-      <button id="importBtn">import</button>
-    </div>
-  </div>
-  <input type="file" id="importFile" accept="application/json">
-
-  <div id="list"></div>
-
-  <footer>stored only on this device, in this browser</footer>
-
-<script>
-(function(){
-  const STORAGE_KEY = 'hipCatchLog_entries';
-  const META_KEY = 'hipCatchLog_meta'; // { firstUse, bestStreak }
-  let entries = [];
-  let meta = { firstUse: null, bestStreak: 0 };
-  let pendingId = null;
-  let pendingSide = new Set();
-
-  // ---- fill your quotes in here, comma-separated, each wrapped in quotes ----
-  const QUOTES = [
-    "You are not your worst day.",
-    "Pain is loud, but it isn't the whole story.",
-    "Rest is not quitting.",
-    "You've gotten through every hard moment so far. That's undefeated.",
-    "This will pass. It always has.",
-    "Slow is still moving.",
-    "You're allowed to have a body that needs patience.",
-    "One catch doesn't erase your progress.",
-    "Healing isn't a straight line, and that's normal.",
-    "You know your body better than anyone else in the room.",
-    "Today's pain isn't a verdict on tomorrow.",
-    "Strength looks like asking for help too.",
-    "You showed up for yourself by logging this.",
-    "Your worth was never tied to how your hips feel today.",
-    "Small steps still count as steps.",
-    "You're doing hard things quietly, and that matters.",
-    "It's okay to be tired of being tough.",
-    "This moment is data, not a defeat.",
-    "You are allowed to take up space while healing.",
-    "Every day you track this is a day you're taking care of yourself.",
-    "Some days the win is just getting back up.",
-    "You don't have to be positive to be strong.",
-    "Your patience with your own body is a kind of courage.",
-    "This is hard. You're still here.",
-    "Progress doesn't always feel like progress in the moment.",
-    "Your hip really said \"not today\" and meant it.",
-    "Two torn labrums and still out here living your life? Iconic.",
-    "Your hips have more drama than a reality show.",
-    "Officially the least chill joints in the group chat.",
-    "Somewhere, a hip surgeon is thinking about you.",
-    "Your body: plot twist enthusiast.",
-    "You didn't choose the catchy life, the catchy life chose you.",
-    "Bones: 0. You: still standing (eventually).",
-    "Your hips are out here cosplaying as a rusty gate.",
-    "This is why we can't have nice things, said your labrum.",
-    "Achievement unlocked: horizontal for 15 minutes, no regrets.",
-    "Your joints have opinions and they will be heard.",
-    "Filing this under \"things my hips did instead of asking.\"",
-    "Bilateral chaos, unilateral attitude.",
-    "You vs. your hip: an ongoing rivalry.",
-    "Your cartilage is out here improvising.",
-    "Not all heroes wear capes, some just try to stand up.",
-    "Your hips called an unscheduled meeting again.",
-    "Breaking news: local hip refuses to cooperate, film at 11.",
-    "Your body really said \"let's keep things interesting.\"",
-    "Cartilage: please see HR, this behavior is unacceptable.",
-    "You're basically a weather system at this point — unpredictable and worth tracking.",
-    "Your hip joints are freelancers now, apparently.",
-    "Plot armor's still intact, hip's just being extra.",
-    "Chronic tear, chronic personality — a real range.",
-    "Try and fake stand up while sitting next time - Your Dad",
-    "Your grabber could have prevented this",
-    "Do you want some blanket - Ashton"
-    
-  ];
-  // ---------------------------------------------------------------------------
-
-  function load(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      entries = raw ? JSON.parse(raw) : [];
-    }catch(e){ entries = []; }
-    try{
-      const rawMeta = localStorage.getItem(META_KEY);
-      meta = rawMeta ? JSON.parse(rawMeta) : { firstUse: new Date().toISOString(), bestStreak: 0 };
-    }catch(e){ meta = { firstUse: new Date().toISOString(), bestStreak: 0 }; }
-    if(!meta.firstUse) meta.firstUse = new Date().toISOString();
-    saveMeta();
-  }
-  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }
-  function saveMeta(){ localStorage.setItem(META_KEY, JSON.stringify(meta)); }
-
-  function startOfDay(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
-  function daysBetween(a,b){ return Math.round((startOfDay(b) - startOfDay(a)) / 86400000); }
-
-  function fmtTime(iso){
-    const d = new Date(iso);
-    return d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
-  }
-  function fmtDay(iso){
-    const d = new Date(iso);
-    const today = new Date();
-    const yest = new Date(); yest.setDate(today.getDate()-1);
-    const sameDay = (a,b)=> a.toDateString()===b.toDateString();
-    if(sameDay(d, today)) return 'Today';
-    if(sameDay(d, yest)) return 'Yesterday';
-    return d.toLocaleDateString([], {weekday:'short', month:'short', day:'numeric'});
-  }
-
-  function currentStreak(){
-    const today = new Date();
-    let lastIncident = null;
-    entries.forEach(e => {
-      const t = new Date(e.timestamp);
-      if(!lastIncident || t > lastIncident) lastIncident = t;
-    });
-    const baseline = lastIncident || new Date(meta.firstUse);
-    let streak = daysBetween(baseline, today);
-    if(streak < 0) streak = 0;
-    return streak;
-  }
-
-  function renderStreak(){
-    const streak = currentStreak();
-    document.getElementById('streakNum').textContent = streak;
-    document.getElementById('streakLabel').textContent = streak === 1 ? 'day since last catch' : 'days since last catch';
-    if(streak > (meta.bestStreak || 0)){
-      meta.bestStreak = streak;
-      saveMeta();
+  // ---------- Load (localStorage, for standalone hosting) ----------
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("college-calendar-data");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        setClasses(parsed.classes || []);
+        setEvents(parsed.events || []);
+        setAssignments(parsed.assignments || []);
+        setTodos(parsed.todos || []);
+        setLoaded(true);
+        return;
+      }
+    } catch (e) {
+      // no saved data yet
     }
-    document.getElementById('streakBest').textContent = meta.bestStreak || 0;
-  }
+    const seed = seedData();
+    setClasses(seed.classes);
+    setEvents(seed.events);
+    setAssignments(seed.assignments);
+    setTodos(seed.todos);
+    setLoaded(true);
+  }, []);
 
-  function renderStats(){
-    document.getElementById('statTotal').textContent = entries.length;
-    const weekAgo = Date.now() - 7*24*60*60*1000;
-    const weekCount = entries.filter(e => new Date(e.timestamp).getTime() >= weekAgo).length;
-    document.getElementById('statWeek').textContent = weekCount;
-    const counts = {L:0, R:0};
-    entries.forEach(e => {
-      if(e.side === 'L') counts.L++;
-      else if(e.side === 'R') counts.R++;
-      else if(e.side === 'Both'){ counts.L++; counts.R++; }
-    });
-    let sideText = '–';
-    if(counts.L > 0 || counts.R > 0){
-      sideText = counts.L === counts.R ? 'Even' : (counts.L > counts.R ? 'L' : 'R');
+  // ---------- Save (localStorage, for standalone hosting) ----------
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      localStorage.setItem("college-calendar-data", JSON.stringify({ classes, events, assignments, todos }));
+    } catch (e) {
+      console.error("Save failed", e);
     }
-    document.getElementById('statSide').textContent = sideText;
+  }, [classes, events, assignments, todos, loaded]);
+
+  const classById = useMemo(() => {
+    const map = {};
+    classes.forEach((c) => (map[c.id] = c));
+    return map;
+  }, [classes]);
+
+  function classesOnDate(date) {
+    const dow = date.getDay();
+    const result = [];
+    classes.forEach((c) => {
+      const slot = c.schedule.find((s) => s.day === dow);
+      if (slot) result.push({ ...c, startTime: slot.startTime, endTime: slot.endTime });
+    });
+    return result;
+  }
+  function eventsOnDate(iso) {
+    return events.filter((e) => e.date === iso);
+  }
+  function assignmentsOnDate(iso) {
+    return assignments.filter((a) => a.dueDate === iso);
+  }
+  function todosOnDate(iso) {
+    return todos.filter((t) => t.dueDate === iso);
+  }
+  function dueItemsOnDate(iso) {
+    return [
+      ...assignmentsOnDate(iso).map((a) => ({ ...a, kind: "assignment" })),
+      ...todosOnDate(iso).map((t) => ({ ...t, kind: "todo" })),
+    ];
   }
 
-  function renderList(){
-    const list = document.getElementById('list');
-    list.innerHTML = '';
-    if(entries.length === 0){
-      list.innerHTML = '<div class="empty">No episodes logged yet. Tap the button above the moment it happens.</div>';
-      return;
+  function addClass(c) {
+    setClasses((prev) => [...prev, { ...c, id: uid() }]);
+  }
+  function addEvent(e) {
+    setEvents((prev) => [...prev, { ...e, id: uid() }]);
+  }
+  function addAssignment(a) {
+    setAssignments((prev) => [...prev, { ...a, id: uid(), completed: false }]);
+  }
+  function addTodo(t) {
+    setTodos((prev) => [...prev, { ...t, id: uid(), completed: false }]);
+  }
+  function toggleAssignmentComplete(id) {
+    setAssignments((prev) => prev.map((a) => (a.id === id ? { ...a, completed: !a.completed } : a)));
+  }
+  function toggleTodoComplete(id) {
+    setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)));
+  }
+  function removeClass(id) {
+    setClasses((prev) => prev.filter((c) => c.id !== id));
+  }
+  function removeEvent(id) {
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+  }
+  function removeAssignment(id) {
+    setAssignments((prev) => prev.filter((a) => a.id !== id));
+  }
+  function removeTodo(id) {
+    setTodos((prev) => prev.filter((t) => t.id !== id));
+  }
+  function removeDueItem(item) {
+    if (item.kind === "todo") removeTodo(item.id);
+    else removeAssignment(item.id);
+  }
+
+  // ---------- Calendar grid math ----------
+  const monthMatrix = useMemo(() => {
+    const y = cursor.getFullYear(), m = cursor.getMonth();
+    const first = new Date(y, m, 1);
+    const startOffset = first.getDay();
+    const gridStart = new Date(y, m, 1 - startOffset);
+    const weeks = [];
+    let d = new Date(gridStart);
+    for (let w = 0; w < 6; w++) {
+      const row = [];
+      for (let i = 0; i < 7; i++) {
+        row.push(new Date(d));
+        d.setDate(d.getDate() + 1);
+      }
+      weeks.push(row);
     }
-    const sorted = [...entries].sort((a,b)=> new Date(b.timestamp) - new Date(a.timestamp));
-    const groups = {};
-    sorted.forEach(e => {
-      const key = fmtDay(e.timestamp);
-      if(!groups[key]) groups[key] = [];
-      groups[key].push(e);
-    });
-    Object.keys(groups).forEach(dayKey => {
-      const dayDiv = document.createElement('div');
-      dayDiv.className = 'day-group';
-      const label = document.createElement('div');
-      label.className = 'day-label';
-      label.textContent = dayKey;
-      dayDiv.appendChild(label);
-      groups[dayKey].forEach(e => {
-        const div = document.createElement('div');
-        div.className = 'entry';
-        const metaBits = [];
-        if(e.side) metaBits.push(e.side);
-        if(e.duration) metaBits.push(e.duration);
-        div.innerHTML = `
-          <div class="entry-top">
-            <span class="entry-time">${fmtTime(e.timestamp)}</span>
-            <span class="entry-meta">${metaBits.join(' · ') || 'no details'}</span>
-          </div>
-          <div class="entry-detail">
-            ${e.notes ? `<div style="margin-bottom:8px;">${escapeHtml(e.notes)}</div>` : ''}
-            <button class="edit" data-id="${e.id}">edit entry</button>
-            <button class="del" data-id="${e.id}">delete entry</button>
-          </div>
-        `;
-        div.addEventListener('click', (ev) => {
-          if(ev.target.classList.contains('del')) return;
-          div.classList.toggle('open');
-        });
-        dayDiv.appendChild(div);
-      });
-      list.appendChild(dayDiv);
-    });
-    list.querySelectorAll('.del').forEach(btn => {
-      btn.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        const id = btn.getAttribute('data-id');
-        entries = entries.filter(e => e.id !== id);
-        save();
-        renderList();
-        renderStats();
-        renderStreak();
-      });
-    });
-    list.querySelectorAll('.edit').forEach(btn => {
-      btn.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        const id = btn.getAttribute('data-id');
-        const entry = entries.find(e => e.id === id);
-        if(entry) openEditor(entry);
-      });
-    });
+    return weeks;
+  }, [cursor]);
+
+  const weekRow = useMemo(() => {
+    const d = new Date(cursor);
+    const offset = d.getDay();
+    const start = new Date(d);
+    start.setDate(d.getDate() - offset);
+    const row = [];
+    for (let i = 0; i < 7; i++) {
+      const dd = new Date(start);
+      dd.setDate(start.getDate() + i);
+      row.push(dd);
+    }
+    return row;
+  }, [cursor]);
+
+  const today = new Date();
+  const todayISO = toISO(today);
+
+  function shiftMonth(delta) {
+    setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + delta, 1));
+  }
+  function shiftWeek(delta) {
+    const d = new Date(cursor);
+    d.setDate(d.getDate() + delta * 7);
+    setCursor(d);
   }
 
-  function escapeHtml(s){
-    const div = document.createElement('div');
-    div.textContent = s;
-    return div.innerHTML;
+  const scaledFont = 16 * scale;
+
+  if (!loaded) {
+    return (
+      <div style={{ fontFamily: "Quicksand, sans-serif", fontSize: scaledFont, background: "#FAF3EB" }} className="min-h-screen flex items-center justify-center">
+        <p className="text-lg" style={{ color: "#6B5142" }}>Loading your semester…</p>
+      </div>
+    );
   }
 
-  function showQuote(){
-    const banner = document.getElementById('quoteBanner');
-    if(QUOTES.length === 0){ banner.classList.remove('show'); return; }
-    const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-    document.getElementById('quoteText').textContent = q;
-    banner.classList.remove('show');
-    void banner.offsetWidth;
-    banner.classList.add('show');
-  }
-
-  function logNow(){
-    const id = 'e' + Date.now() + Math.random().toString(36).slice(2,7);
-    const entry = { id, timestamp: new Date().toISOString(), side: null, duration: null, notes: null };
-    entries.push(entry);
-    save();
-    renderList();
-    renderStats();
-    renderStreak();
-    showQuote();
-    openToast(entry);
-  }
-
-  function openToast(entry){
-    pendingId = entry.id;
-    pendingSide = new Set();
-    document.getElementById('toastLabel').textContent = 'Logged';
-    document.getElementById('toastTime').textContent = fmtTime(entry.timestamp);
-    document.getElementById('notesInput').value = '';
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    updateHipVisual();
-    document.getElementById('toast').classList.add('show');
-  }
-
-  function openEditor(entry){
-    pendingId = entry.id;
-    pendingSide = new Set();
-    if(entry.side === 'Both'){ pendingSide.add('L'); pendingSide.add('R'); }
-    else if(entry.side === 'L'){ pendingSide.add('L'); }
-    else if(entry.side === 'R'){ pendingSide.add('R'); }
-
-    document.getElementById('toastLabel').textContent = 'Editing entry from';
-    document.getElementById('toastTime').textContent = fmtTime(entry.timestamp);
-    document.getElementById('notesInput').value = entry.notes || '';
-
-    document.querySelectorAll('#durationChips .chip').forEach(c => {
-      c.classList.toggle('active', c.getAttribute('data-val') === entry.duration);
-    });
-
-    updateHipVisual();
-    const toast = document.getElementById('toast');
-    toast.classList.add('show');
-    toast.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
-  function closeToast(){
-    document.getElementById('toast').classList.remove('show');
-    pendingId = null;
-  }
-
-  function updateHipVisual(){
-    const left = document.querySelector('#hipLeft circle');
-    const right = document.querySelector('#hipRight circle');
-    left.setAttribute('fill', pendingSide.has('L') ? '#F7E3E7' : '#F5E9E2');
-    left.setAttribute('stroke', pendingSide.has('L') ? '#D88C9A' : '#EEDDD3');
-    right.setAttribute('fill', pendingSide.has('R') ? '#F7E3E7' : '#F5E9E2');
-    right.setAttribute('stroke', pendingSide.has('R') ? '#D88C9A' : '#EEDDD3');
-  }
-
-  document.getElementById('logBtn').addEventListener('click', logNow);
-  document.getElementById('toastClose').addEventListener('click', closeToast);
-
-  document.getElementById('hipLeft').addEventListener('click', () => {
-    pendingSide.has('L') ? pendingSide.delete('L') : pendingSide.add('L');
-    updateHipVisual();
-  });
-  document.getElementById('hipRight').addEventListener('click', () => {
-    pendingSide.has('R') ? pendingSide.delete('R') : pendingSide.add('R');
-    updateHipVisual();
-  });
-
-  document.getElementById('durationChips').addEventListener('click', (ev) => {
-    const chip = ev.target.closest('.chip');
-    if(!chip) return;
-    document.querySelectorAll('#durationChips .chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-  });
-
-  document.getElementById('saveDetails').addEventListener('click', () => {
-    if(!pendingId) return;
-    const entry = entries.find(e => e.id === pendingId);
-    if(!entry) return;
-    let side = null;
-    if(pendingSide.size === 2) side = 'Both';
-    else if(pendingSide.has('L')) side = 'L';
-    else if(pendingSide.has('R')) side = 'R';
-    entry.side = side;
-    const activeChip = document.querySelector('#durationChips .chip.active');
-    entry.duration = activeChip ? activeChip.getAttribute('data-val') : null;
-    const notes = document.getElementById('notesInput').value.trim();
-    entry.notes = notes || null;
-    save();
-    renderList();
-    renderStats();
-    closeToast();
-  });
-
-  document.getElementById('exportBtn').addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(entries, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'catch-log-export-' + new Date().toISOString().slice(0,10) + '.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  });
-
-  document.getElementById('importBtn').addEventListener('click', () => {
-    document.getElementById('importFile').click();
-  });
-  document.getElementById('importFile').addEventListener('change', (ev) => {
-    const file = ev.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try{
-        const imported = JSON.parse(reader.result);
-        if(Array.isArray(imported)){
-          const existingIds = new Set(entries.map(e => e.id));
-          imported.forEach(e => { if(e && e.id && !existingIds.has(e.id)) entries.push(e); });
-          save();
-          renderList();
-          renderStats();
-          renderStreak();
+  return (
+    <div
+      style={{ fontSize: `${scaledFont}px`, fontFamily: "'Quicksand', sans-serif", background: "#FAF3EB" }}
+      className="min-h-screen w-full"
+    >
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
+        .font-display { font-family: 'Fredoka', sans-serif; }
+        .font-mono { font-family: 'Quicksand', sans-serif; font-weight: 600; }
+        .stub-chip {
+          border: 1.5px dashed currentColor;
+          background: repeating-linear-gradient(135deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 4px, transparent 4px, transparent 8px);
         }
-      }catch(e){}
-    };
-    reader.readAsText(file);
-    ev.target.value = '';
-  });
+        .day-cell { transition: transform .12s ease, box-shadow .12s ease; }
+        .day-cell:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(30,20,10,0.12); }
+        .pin-dot { box-shadow: 0 1px 2px rgba(0,0,0,0.35) inset, 0 1px 1px rgba(255,255,255,0.4); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: #D9D2C4; border-radius: 4px; }
+      `}</style>
 
-  load();
-  renderList();
-  renderStats();
-  renderStreak();
-})();
+      {/* Header */}
+      <header className="sticky top-0 z-30" style={{ background: "#FFFFFF", borderBottom: "1px solid #DED7C9" }}>
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 pt-4 flex flex-wrap items-center gap-3 justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "#C7A491" }}>
+              <Heart size={16} color="white" fill="white" />
+            </div>
+            <h1 className="font-display" style={{ fontSize: "1.5em", fontWeight: 600, color: "#6B5142" }}>
+              My Semester
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center rounded-full" style={{ background: "#C7CDBF" }}>
+              <button aria-label="Decrease text size" onClick={() => setScale((s) => Math.max(0.9, +(s - 0.1).toFixed(2)))} className="p-2" style={{ color: "#96897E" }}>
+                <Minus size={16} />
+              </button>
+              <span className="px-1 font-mono" style={{ fontSize: "0.7em", color: "#96897E" }}>Aa</span>
+              <button aria-label="Increase text size" onClick={() => setScale((s) => Math.min(1.5, +(s + 0.1).toFixed(2)))} className="p-2" style={{ color: "#96897E" }}>
+                <Plus size={16} />
+              </button>
+            </div>
+
+            <button
+              onClick={() => setManageOpen(true)}
+              className="p-2 rounded-full"
+              style={{ background: "#C7CDBF", color: "#6B5142" }}
+              aria-label="Manage classes"
+            >
+              <Settings2 size={18} />
+            </button>
+
+            <button
+              onClick={() => {
+                setPrefillDate(null);
+                setAddTab(page === "assignments" ? "assignment" : page === "todo" ? "todo" : "class");
+                setAddOpen(true);
+              }}
+              className="flex items-center gap-1 px-4 py-2 rounded-full text-white font-semibold"
+              style={{ background: "#C7A491" }}
+            >
+              <Plus size={18} /> Add
+            </button>
+          </div>
+        </div>
+
+        {/* Page tabs */}
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 pt-4">
+          <SegmentedControl
+            value={page}
+            onChange={setPage}
+            options={[
+              { value: "calendar", label: "Calendar" },
+              { value: "assignments", label: "Assignments" },
+              { value: "todo", label: "To-Do" },
+            ]}
+          />
+        </div>
+
+        {/* Nav row */}
+        {page === "calendar" && (
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 pt-4 pb-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <button onClick={() => (view === "month" ? shiftMonth(-1) : shiftWeek(-1))} className="p-2 rounded-full" style={{ background: "#C7CDBF", color: "#6B5142" }}>
+              <ChevronLeft size={20} />
+            </button>
+            <h2 className="font-display" style={{ fontSize: "1.2em", fontWeight: 600, minWidth: "10ch", color: "#6B5142" }}>
+              {view === "month"
+                ? `${MONTHS[cursor.getMonth()]} ${cursor.getFullYear()}`
+                : `${MONTHS[weekRow[0].getMonth()]} ${weekRow[0].getDate()} – ${MONTHS[weekRow[6].getMonth()]} ${weekRow[6].getDate()}`}
+            </h2>
+            <button onClick={() => (view === "month" ? shiftMonth(1) : shiftWeek(1))} className="p-2 rounded-full" style={{ background: "#C7CDBF", color: "#6B5142" }}>
+              <ChevronRight size={20} />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCursor(new Date())}
+              className="px-3 py-1.5 rounded-full font-medium"
+              style={{ background: "#FAF3EB", color: "#6B5142" }}
+            >
+              Today
+            </button>
+            <SegmentedControl
+              value={view}
+              onChange={setView}
+              options={[
+                { value: "month", label: "Month" },
+                { value: "week", label: "Week" },
+              ]}
+            />
+          </div>
+        </div>
+        )}
+
+        {/* Legend */}
+        {page === "calendar" && (
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 pb-3 flex gap-2 overflow-x-auto">
+          {classes.map((c) => (
+            <span key={c.id} className="flex items-center gap-1.5 px-2.5 py-1 rounded-full whitespace-nowrap" style={{ background: "#FAF3EB" }}>
+              <span className="w-2.5 h-2.5 rounded-full pin-dot" style={{ background: c.color }} />
+              <span style={{ fontSize: "0.75em", color: "#6B5142" }}>{c.name}</span>
+            </span>
+          ))}
+          {Object.entries(CATEGORY).map(([k, v]) => (
+            <span key={k} className="flex items-center gap-1.5 px-2.5 py-1 rounded-full whitespace-nowrap" style={{ background: "#FAF3EB" }}>
+              <span className="w-2.5 h-2.5 rounded-full pin-dot" style={{ background: v.color }} />
+              <span style={{ fontSize: "0.75em", color: "#6B5142" }}>{v.label}</span>
+            </span>
+          ))}
+          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full whitespace-nowrap stub-chip" style={{ color: "#96897E" }}>
+            <span style={{ fontSize: "0.75em" }}>Due dates (dashed)</span>
+          </span>
+        </div>
+        )}
+      </header>
+
+
+      {/* Body */}
+      <main className="max-w-6xl mx-auto px-2 sm:px-6 py-6">
+        {page === "assignments" ? (
+          <AssignmentsPage
+            classes={classes}
+            assignments={assignments}
+            classById={classById}
+            onAdd={addAssignment}
+            onToggle={toggleAssignmentComplete}
+            onRemove={removeAssignment}
+          />
+        ) : page === "todo" ? (
+          <ToDoPage
+            todos={todos}
+            onAdd={addTodo}
+            onToggle={toggleTodoComplete}
+            onRemove={removeTodo}
+          />
+        ) : view === "month" ? (
+          <MonthGrid
+            weeks={monthMatrix}
+            cursorMonth={cursor.getMonth()}
+            todayISO={todayISO}
+            classesOnDate={classesOnDate}
+            eventsOnDate={eventsOnDate}
+            dueItemsOnDate={dueItemsOnDate}
+            classById={classById}
+            onSelect={(iso) => setSelectedDate(iso)}
+          />
+        ) : (
+          <WeekGrid
+            days={weekRow}
+            todayISO={todayISO}
+            classesOnDate={classesOnDate}
+            eventsOnDate={eventsOnDate}
+            dueItemsOnDate={dueItemsOnDate}
+            classById={classById}
+            onSelect={(iso) => setSelectedDate(iso)}
+          />
+        )}
+      </main>
+
+      {/* Day detail modal */}
+      {selectedDate && (
+        <DayModal
+          iso={selectedDate}
+          onClose={() => setSelectedDate(null)}
+          classesOnDate={classesOnDate}
+          eventsOnDate={eventsOnDate}
+          dueItemsOnDate={dueItemsOnDate}
+          classById={classById}
+          removeEvent={removeEvent}
+          removeDueItem={removeDueItem}
+          onAddEvent={() => { setPrefillDate(selectedDate); setAddTab("event"); setAddOpen(true); }}
+          onAddAssignment={() => { setPrefillDate(selectedDate); setAddTab("assignment"); setAddOpen(true); }}
+          onAddTodo={() => { setPrefillDate(selectedDate); setAddTab("todo"); setAddOpen(true); }}
+        />
+      )}
+
+      {/* Add modal */}
+      {addOpen && (
+        <AddModal
+          tab={addTab}
+          setTab={setAddTab}
+          onClose={() => setAddOpen(false)}
+          classes={classes}
+          prefillDate={prefillDate}
+          onAddClass={(c) => { addClass(c); setAddOpen(false); }}
+          onAddEvent={(e) => { addEvent(e); setAddOpen(false); }}
+          onAddAssignment={(a) => { addAssignment(a); setAddOpen(false); }}
+          onAddTodo={(t) => { addTodo(t); setAddOpen(false); }}
+        />
+      )}
+
+      {/* Manage classes modal */}
+      {manageOpen && (
+        <ManageModal
+          classes={classes}
+          onClose={() => setManageOpen(false)}
+          onRemove={removeClass}
+          onAddNew={() => { setManageOpen(false); setAddTab("class"); setAddOpen(true); }}
+        />
+      )}
+    </div>
+  );
+}
+
+// ---------- Month Grid ----------
+function MonthGrid({ weeks, cursorMonth, todayISO, classesOnDate, eventsOnDate, dueItemsOnDate, classById, onSelect }) {
+  return (
+    <div className="rounded-2xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #DED7C9" }}>
+      <div className="grid grid-cols-7">
+        {DAYS.map((d) => (
+          <div key={d} className="text-center py-2 font-semibold" style={{ color: "#96897E", fontSize: "0.85em", borderBottom: "1px solid #F2DFD6" }}>
+            {d}
+          </div>
+        ))}
+      </div>
+      {weeks.map((row, ri) => (
+        <div key={ri} className="grid grid-cols-7" style={{ borderTop: ri === 0 ? "none" : "1px solid #F2DFD6" }}>
+          {row.map((date) => {
+            const iso = toISO(date);
+            const inMonth = date.getMonth() === cursorMonth;
+            const classItems = classesOnDate(date);
+            const evItems = eventsOnDate(iso);
+            const dueItems = dueItemsOnDate(iso);
+            const all = [...classItems.map((c) => ({ kind: "class", ...c })), ...evItems.map((e) => ({ kind: "event", ...e }))];
+            const visible = all.slice(0, 2);
+            const overflow = all.length - visible.length;
+            return (
+              <button
+                key={iso}
+                onClick={() => onSelect(iso)}
+                className="day-cell text-left p-1.5 sm:p-2 flex flex-col gap-1 min-h-[5.5em] sm:min-h-[7em]"
+                style={{
+                  background: inMonth ? "#FFFFFF" : "#F2E9DE",
+                  borderRight: "1px solid #F2DFD6",
+                  opacity: inMonth ? 1 : 0.55,
+                }}
+              >
+                <span
+                  className="w-6 h-6 flex items-center justify-center rounded-full font-mono"
+                  style={{
+                    fontSize: "0.75em",
+                    background: iso === todayISO ? "#C7A491" : "transparent",
+                    color: iso === todayISO ? "white" : "#6B5142",
+                    fontWeight: iso === todayISO ? 700 : 500,
+                  }}
+                >
+                  {date.getDate()}
+                </span>
+                <div className="flex flex-col gap-0.5">
+                  {visible.map((item, idx) => (
+                    <span
+                      key={idx}
+                      className="truncate rounded px-1 py-0.5 text-white"
+                      style={{ fontSize: "0.65em", background: item.kind === "class" ? item.color : CATEGORY[item.category].color }}
+                    >
+                      {item.kind === "class" ? item.name : item.title}
+                    </span>
+                  ))}
+                  {overflow > 0 && (
+                    <span style={{ fontSize: "0.65em", color: "#B8AFA2" }}>+{overflow} more</span>
+                  )}
+                  {dueItems.slice(0, 1).map((d) => {
+                    const cls = d.kind === "assignment" && d.classId ? classById[d.classId] : null;
+                    const color = cls ? cls.color : "#96897E";
+                    return (
+                      <span
+                        key={d.id}
+                        className="stub-chip truncate rounded px-1 py-0.5"
+                        style={{ fontSize: "0.65em", color, textDecoration: d.completed ? "line-through" : "none", opacity: d.completed ? 0.55 : 1 }}
+                      >
+                        {d.kind === "todo" ? "To-do: " : "Due: "}{d.title}
+                      </span>
+                    );
+                  })}
+                  {dueItems.length > 1 && (
+                    <span style={{ fontSize: "0.65em", color: "#B8AFA2" }}>+{dueItems.length - 1} due</span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ---------- Week Grid ----------
+function WeekGrid({ days, todayISO, classesOnDate, eventsOnDate, dueItemsOnDate, classById, onSelect }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-7 gap-3">
+      {days.map((date) => {
+        const iso = toISO(date);
+        const classItems = classesOnDate(date).sort((a, b) => a.startTime.localeCompare(b.startTime));
+        const evItems = eventsOnDate(iso);
+        const dueItems = dueItemsOnDate(iso);
+        const isToday = iso === todayISO;
+        return (
+          <button
+            key={iso}
+            onClick={() => onSelect(iso)}
+            className="day-cell text-left rounded-2xl p-3 flex flex-col gap-2"
+            style={{
+              background: "#FFFFFF",
+              border: isToday ? "2px solid #C7A491" : "1px solid #DED7C9",
+              minHeight: "10em",
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-semibold" style={{ color: "#6B5142", fontSize: "0.9em" }}>{DAYS[date.getDay()]} {date.getDate()}</span>
+              {isToday && <span className="px-2 py-0.5 rounded-full text-white" style={{ background: "#C7A491", fontSize: "0.6em" }}>Today</span>}
+            </div>
+            <div className="flex flex-col gap-1">
+              {classItems.map((c) => (
+                <div key={c.id} className="rounded px-1.5 py-1 text-white flex items-center gap-1" style={{ background: c.color, fontSize: "0.7em" }}>
+                  <Clock size={11} /> {c.startTime}–{c.endTime} {c.name}
+                </div>
+              ))}
+              {evItems.map((e) => (
+                <div key={e.id} className="rounded px-1.5 py-1 text-white" style={{ background: CATEGORY[e.category].color, fontSize: "0.7em" }}>
+                  {e.title}
+                </div>
+              ))}
+              {dueItems.map((d) => {
+                const cls = d.kind === "assignment" && d.classId ? classById[d.classId] : null;
+                const color = cls ? cls.color : "#96897E";
+                return (
+                  <div key={d.id} className="stub-chip rounded px-1.5 py-1" style={{ color, fontSize: "0.7em", textDecoration: d.completed ? "line-through" : "none", opacity: d.completed ? 0.55 : 1 }}>
+                    {d.kind === "todo" ? `To-do: ${d.title}` : `Due: ${d.title} (${ASSIGN_TYPE[d.type].label})`}
+                  </div>
+                );
+              })}
+              {classItems.length + evItems.length + dueItems.length === 0 && (
+                <span style={{ color: "#C9BCAE", fontSize: "0.75em" }}>Nothing scheduled</span>
+              )}
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---------- Assignments Page ----------
+function AssignmentsPage({ classes, assignments, classById, onAdd, onToggle, onRemove }) {
+  const sorted = [...assignments].sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+  const todayISO = toISO(new Date());
+
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="rounded-2xl p-5" style={{ background: "#FFFFFF", border: "1px solid #DED7C9" }}>
+        <h3 className="font-display mb-4" style={{ fontSize: "1.15em", fontWeight: 600, color: "#6B5142" }}>
+          Add an assignment, test, or project
+        </h3>
+        <AssignmentForm onSubmit={onAdd} classes={classes} />
+      </div>
+
+      <div>
+        <h3 className="font-display mb-3" style={{ fontSize: "1.15em", fontWeight: 600, color: "#6B5142" }}>
+          All Assignments
+        </h3>
+        <div className="flex flex-col gap-2">
+          {sorted.length === 0 && <Empty text="Nothing on your plate yet." />}
+          {sorted.map((a) => {
+            const cls = a.classId ? classById[a.classId] : null;
+            return (
+              <ChecklistRow
+                key={a.id}
+                item={a}
+                color={cls ? cls.color : "#96897E"}
+                subtitle={`${ASSIGN_TYPE[a.type].label}${cls ? " · " + cls.name : ""}`}
+                overdue={!a.completed && a.dueDate < todayISO}
+                onToggle={() => onToggle(a.id)}
+                onRemove={() => onRemove(a.id)}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {classes.map((c) => {
+        const items = sorted.filter((a) => a.classId === c.id);
+        if (items.length === 0) return null;
+        return (
+          <div key={c.id}>
+            <h3 className="font-display mb-3 flex items-center gap-2" style={{ fontSize: "1.15em", fontWeight: 600, color: "#6B5142" }}>
+              <span className="w-3 h-3 rounded-full pin-dot" style={{ background: c.color }} />
+              {c.name}
+            </h3>
+            <div className="flex flex-col gap-2">
+              {items.map((a) => (
+                <ChecklistRow
+                  key={a.id}
+                  item={a}
+                  color={c.color}
+                  subtitle={ASSIGN_TYPE[a.type].label}
+                  overdue={!a.completed && a.dueDate < todayISO}
+                  onToggle={() => onToggle(a.id)}
+                  onRemove={() => onRemove(a.id)}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      {assignments.some((a) => !a.classId) && (
+        <div>
+          <h3 className="font-display mb-3" style={{ fontSize: "1.15em", fontWeight: 600, color: "#6B5142" }}>
+            Other
+          </h3>
+          <div className="flex flex-col gap-2">
+            {sorted.filter((a) => !a.classId).map((a) => (
+              <ChecklistRow
+                key={a.id}
+                item={a}
+                color="#96897E"
+                subtitle={ASSIGN_TYPE[a.type].label}
+                overdue={!a.completed && a.dueDate < todayISO}
+                onToggle={() => onToggle(a.id)}
+                onRemove={() => onRemove(a.id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- To-Do Page ----------
+function ToDoPage({ todos, onAdd, onToggle, onRemove }) {
+  const todayISO = toISO(new Date());
+  const withDate = todos.filter((t) => t.dueDate).sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+  const withoutDate = todos.filter((t) => !t.dueDate);
+
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="rounded-2xl p-5" style={{ background: "#FFFFFF", border: "1px solid #DED7C9" }}>
+        <h3 className="font-display mb-4" style={{ fontSize: "1.15em", fontWeight: 600, color: "#6B5142" }}>
+          Add a to-do
+        </h3>
+        <TodoForm onSubmit={onAdd} />
+      </div>
+
+      <div>
+        <h3 className="font-display mb-3" style={{ fontSize: "1.15em", fontWeight: 600, color: "#6B5142" }}>
+          To-Do List
+        </h3>
+        <div className="flex flex-col gap-2">
+          {todos.length === 0 && <Empty text="Nothing on your list yet." />}
+          {withDate.map((t) => (
+            <ChecklistRow
+              key={t.id}
+              item={t}
+              color="#C7A491"
+              subtitle={null}
+              overdue={!t.completed && t.dueDate < todayISO}
+              onToggle={() => onToggle(t.id)}
+              onRemove={() => onRemove(t.id)}
+            />
+          ))}
+          {withoutDate.map((t) => (
+            <ChecklistRow
+              key={t.id}
+              item={t}
+              color="#96897E"
+              subtitle={null}
+              onToggle={() => onToggle(t.id)}
+              onRemove={() => onRemove(t.id)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChecklistRow({ item, color, subtitle, overdue, onToggle, onRemove }) {
+  return (
+    <div
+      className="flex items-center gap-3 rounded-xl px-4 py-3"
+      style={{ background: "#FFFFFF", border: `1px solid ${overdue ? "#B06A52" : "#DED7C9"}` }}
+    >
+      <button
+        onClick={onToggle}
+        aria-label={item.completed ? "Mark incomplete" : "Mark complete"}
+        className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+        style={{ border: `2px solid ${color}`, background: item.completed ? color : "transparent" }}
+      >
+        {item.completed && <Check size={14} color="white" />}
+      </button>
+      <div className="flex-1 min-w-0">
+        <p
+          className="font-medium truncate"
+          style={{
+            fontSize: "0.95em",
+            color: item.completed ? "#B8AFA2" : "#6B5142",
+            textDecoration: item.completed ? "line-through" : "none",
+          }}
+        >
+          {item.title}
+        </p>
+        {(subtitle || item.dueDate) && (
+          <p style={{ fontSize: "0.75em", color: overdue ? "#B06A52" : "#B8AFA2" }}>
+            {subtitle}
+            {subtitle && item.dueDate ? " · " : ""}
+            {item.dueDate ? `${overdue ? "Overdue: " : "Due "}${item.dueDate}` : ""}
+          </p>
+        )}
+      </div>
+      <button onClick={onRemove} aria-label="Delete" className="p-1 rounded-full shrink-0" style={{ color: "#B8AFA2" }}>
+        <Trash2 size={16} />
+      </button>
+    </div>
+  );
+}
+
+// ---------- Day Detail Modal ----------
+function DayModal({ iso, onClose, classesOnDate, eventsOnDate, dueItemsOnDate, classById, removeEvent, removeDueItem, onAddEvent, onAddAssignment, onAddTodo }) {
+  const date = new Date(iso + "T00:00:00");
+  const classItems = classesOnDate(date).sort((a, b) => a.startTime.localeCompare(b.startTime));
+  const evItems = eventsOnDate(iso);
+  const dueItems = dueItemsOnDate(iso);
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4" style={{ background: "rgba(30,25,15,0.45)" }} onClick={onClose}>
+      <div
+        className="w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl p-5 max-h-[85vh] overflow-y-auto"
+        style={{ background: "#FFFFFF" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-display" style={{ fontSize: "1.3em", fontWeight: 700, color: "#6B5142" }}>
+            {DAYS[date.getDay()]}, {MONTHS[date.getMonth()]} {date.getDate()}
+          </h3>
+          <button onClick={onClose} className="p-1.5 rounded-full" style={{ background: "#FAF3EB" }}>
+            <X size={18} />
+          </button>
+        </div>
+
+        <Section title="Classes" icon={BookOpen}>
+          {classItems.length === 0 && <Empty text="No classes today." />}
+          {classItems.map((c) => (
+            <Row key={c.id} color={c.color} title={c.name} sub={`${c.startTime}–${c.endTime}${c.location ? " · " + c.location : ""}`} />
+          ))}
+        </Section>
+
+        <Section
+          title="Due Today"
+          icon={Heart}
+          action={{ label: "Add school work", onClick: onAddAssignment }}
+          secondaryAction={{ label: "Add to-do", onClick: onAddTodo }}
+        >
+          {dueItems.length === 0 && <Empty text="Nothing due." />}
+          {dueItems.map((d) => {
+            const cls = d.kind === "assignment" && d.classId ? classById[d.classId] : null;
+            return (
+              <Row
+                key={d.id}
+                color={cls ? cls.color : "#96897E"}
+                title={d.title}
+                sub={d.kind === "todo" ? "Personal to-do" : `${ASSIGN_TYPE[d.type].label}${cls ? " · " + cls.name : ""}`}
+                dashed
+                strikethrough={d.completed}
+                onDelete={() => removeDueItem(d)}
+              />
+            );
+          })}
+        </Section>
+
+        <Section title="Events & More" icon={CalendarDays} action={{ label: "Add event", onClick: onAddEvent }}>
+          {evItems.length === 0 && <Empty text="Nothing else planned." />}
+          {evItems.map((e) => (
+            <Row key={e.id} color={CATEGORY[e.category].color} title={e.title} sub={CATEGORY[e.category].label} onDelete={() => removeEvent(e.id)} />
+          ))}
+        </Section>
+      </div>
+    </div>
+  );
+}
+
+function Section({ title, icon: Icon, action, secondaryAction, children }) {
+  return (
+    <div className="mb-5">
+      <div className="flex items-center justify-between mb-2 flex-wrap gap-1">
+        <div className="flex items-center gap-2">
+          <Icon size={16} color="#B8AFA2" />
+          <h4 className="font-semibold" style={{ color: "#96897E", fontSize: "0.95em" }}>{title}</h4>
+        </div>
+        <div className="flex items-center gap-3">
+          {action && (
+            <button onClick={action.onClick} className="text-sm font-medium underline" style={{ color: "#C7A491" }}>
+              {action.label}
+            </button>
+          )}
+          {secondaryAction && (
+            <button onClick={secondaryAction.onClick} className="text-sm font-medium underline" style={{ color: "#C7A491" }}>
+              {secondaryAction.label}
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">{children}</div>
+    </div>
+  );
+}
+
+function Empty({ text }) {
+  return <p style={{ color: "#C9BCAE", fontSize: "0.85em" }}>{text}</p>;
+}
+
+function Row({ color, title, sub, dashed, strikethrough, onDelete }) {
+  return (
+    <div
+      className={`flex items-center justify-between rounded-lg px-3 py-2 ${dashed ? "stub-chip" : ""}`}
+      style={dashed ? { color } : { background: color, color: "white" }}
+    >
+      <div>
+        <p className="font-medium" style={{ fontSize: "0.95em", textDecoration: strikethrough ? "line-through" : "none", opacity: strikethrough ? 0.6 : 1 }}>{title}</p>
+        {sub && <p style={{ fontSize: "0.75em", opacity: 0.9 }}>{sub}</p>}
+      </div>
+      {onDelete && (
+        <button onClick={onDelete} aria-label="Delete" className="p-1 rounded-full" style={{ opacity: 0.8 }}>
+          <Trash2 size={15} />
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ---------- Add Modal ----------
+function AddModal({ tab, setTab, onClose, classes, prefillDate, onAddClass, onAddEvent, onAddAssignment, onAddTodo }) {
+  return (
+    <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4" style={{ background: "rgba(30,25,15,0.45)" }} onClick={onClose}>
+      <div className="w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl p-5 max-h-[90vh] overflow-y-auto" style={{ background: "#FFFFFF" }} onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-display" style={{ fontSize: "1.3em", fontWeight: 700, color: "#6B5142" }}>Add to calendar</h3>
+          <button onClick={onClose} className="p-1.5 rounded-full" style={{ background: "#FAF3EB" }}><X size={18} /></button>
+        </div>
+
+        <div className="mb-5 overflow-x-auto">
+          <SegmentedControl
+            value={tab}
+            onChange={setTab}
+            options={[
+              { value: "class", label: "Class" },
+              { value: "event", label: "Event" },
+              { value: "assignment", label: "School Work" },
+              { value: "todo", label: "To-Do" },
+            ]}
+          />
+        </div>
+
+        {tab === "class" && <ClassForm onSubmit={onAddClass} />}
+        {tab === "event" && <EventForm onSubmit={onAddEvent} prefillDate={prefillDate} />}
+        {tab === "assignment" && <AssignmentForm onSubmit={onAddAssignment} classes={classes} prefillDate={prefillDate} />}
+        {tab === "todo" && <TodoForm onSubmit={onAddTodo} prefillDate={prefillDate} />}
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, children }) {
+  return (
+    <label className="block mb-3">
+      <span className="block font-medium mb-1" style={{ fontSize: "0.85em", color: "#96897E" }}>{label}</span>
+      {children}
+    </label>
+  );
+}
+
+const inputStyle = {
+  width: "100%",
+  padding: "0.6em 0.8em",
+  borderRadius: "0.6em",
+  border: "1px solid #DED7C9",
+  background: "white",
+  fontSize: "0.95em",
+  color: "#6B5142",
+};
+
+function ClassForm({ onSubmit }) {
+  const [name, setName] = useState("");
+  const [color, setColor] = useState(CLASS_PALETTE[0].value);
+  const [location, setLocation] = useState("");
+  const [defaultStart, setDefaultStart] = useState("09:00");
+  const [defaultEnd, setDefaultEnd] = useState("09:50");
+  const [varyByDay, setVaryByDay] = useState(false);
+  // map of day index -> { startTime, endTime }, only for selected days
+  const [dayTimes, setDayTimes] = useState({});
+
+  const selectedDays = Object.keys(dayTimes).map(Number).sort((a, b) => a - b);
+
+  function toggleDay(i) {
+    setDayTimes((prev) => {
+      const next = { ...prev };
+      if (next[i]) {
+        delete next[i];
+      } else {
+        next[i] = { startTime: defaultStart, endTime: defaultEnd };
+      }
+      return next;
+    });
+  }
+
+  function updateDayTime(i, field, value) {
+    setDayTimes((prev) => ({ ...prev, [i]: { ...prev[i], [field]: value } }));
+  }
+
+  function handleSubmit() {
+    const schedule = selectedDays.map((i) => ({
+      day: i,
+      startTime: varyByDay ? dayTimes[i].startTime : defaultStart,
+      endTime: varyByDay ? dayTimes[i].endTime : defaultEnd,
+    }));
+    onSubmit({ name, color, location, schedule });
+  }
+
+  return (
+    <div>
+      <Field label="Class name">
+        <input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Organic Chemistry" />
+      </Field>
+      <Field label="Color">
+        <div className="flex flex-wrap gap-2">
+          {CLASS_PALETTE.map((p) => (
+            <button
+              key={p.value}
+              onClick={() => setColor(p.value)}
+              aria-label={p.name}
+              className="w-8 h-8 rounded-full pin-dot"
+              style={{ background: p.value, border: color === p.value ? "3px solid #6B5142" : "none" }}
+            />
+          ))}
+        </div>
+      </Field>
+      <Field label="Days it meets">
+        <div className="flex gap-1.5 flex-wrap">
+          {DAYS.map((d, i) => (
+            <button
+              key={d}
+              onClick={() => toggleDay(i)}
+              className="px-3 py-1.5 rounded-full font-medium"
+              style={{ fontSize: "0.8em", background: dayTimes[i] ? "#6B5142" : "#FAF3EB", color: dayTimes[i] ? "white" : "#96897E" }}
+            >
+              {d}
+            </button>
+          ))}
+        </div>
+      </Field>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Field label={varyByDay ? "Default start time" : "Start time"}>
+          <input
+            type="time"
+            style={inputStyle}
+            value={defaultStart}
+            onChange={(e) => setDefaultStart(e.target.value)}
+          />
+        </Field>
+        <Field label={varyByDay ? "Default end time" : "End time"}>
+          <input
+            type="time"
+            style={inputStyle}
+            value={defaultEnd}
+            onChange={(e) => setDefaultEnd(e.target.value)}
+          />
+        </Field>
+      </div>
+
+      <button
+        onClick={() => setVaryByDay((v) => !v)}
+        className="flex items-center gap-2 mb-3"
+        type="button"
+      >
+        <span
+          className="w-5 h-5 rounded flex items-center justify-center"
+          style={{ background: varyByDay ? "#C7A491" : "#EECFCA" }}
+        >
+          {varyByDay && <Check size={14} color="white" />}
+        </span>
+        <span style={{ fontSize: "0.85em", color: "#96897E" }}>Times are different on some days (e.g. shorter on Friday)</span>
+      </button>
+
+      {varyByDay && selectedDays.length > 0 && (
+        <div className="mb-3 flex flex-col gap-2 p-3 rounded-xl" style={{ background: "#FAF3EB" }}>
+          {selectedDays.map((i) => (
+            <div key={i} className="flex items-center gap-2">
+              <span className="w-10 font-medium" style={{ fontSize: "0.8em", color: "#6B5142" }}>{DAYS[i]}</span>
+              <input
+                type="time"
+                style={{ ...inputStyle, padding: "0.4em 0.6em" }}
+                value={dayTimes[i].startTime}
+                onChange={(e) => updateDayTime(i, "startTime", e.target.value)}
+              />
+              <span style={{ color: "#B8AFA2" }}>–</span>
+              <input
+                type="time"
+                style={{ ...inputStyle, padding: "0.4em 0.6em" }}
+                value={dayTimes[i].endTime}
+                onChange={(e) => updateDayTime(i, "endTime", e.target.value)}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Field label="Location (optional)">
+        <input style={inputStyle} value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Science Building 210" />
+      </Field>
+      <button
+        disabled={!name || selectedDays.length === 0}
+        onClick={handleSubmit}
+        className="w-full mt-2 py-3 rounded-full font-semibold text-white disabled:opacity-40"
+        style={{ background: "#C7A491" }}
+      >
+        Save class
+      </button>
+    </div>
+  );
+}
+
+function EventForm({ onSubmit, prefillDate }) {
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState(prefillDate || toISO(new Date()));
+  const [category, setCategory] = useState("event");
+  const [notes, setNotes] = useState("");
+
+  return (
+    <div>
+      <Field label="Title">
+        <input style={inputStyle} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Fall Fest" />
+      </Field>
+      <Field label="Type">
+        <div className="flex gap-2">
+          {Object.entries(CATEGORY).map(([k, v]) => (
+            <button
+              key={k}
+              onClick={() => setCategory(k)}
+              className="flex-1 py-2 rounded-full font-medium"
+              style={{ fontSize: "0.8em", background: category === k ? v.color : "#FAF3EB", color: category === k ? "white" : "#96897E" }}
+            >
+              {v.label}
+            </button>
+          ))}
+        </div>
+      </Field>
+      <Field label="Date">
+        <input type="date" style={inputStyle} value={date} onChange={(e) => setDate(e.target.value)} />
+      </Field>
+      <Field label="Notes (optional)">
+        <input style={inputStyle} value={notes} onChange={(e) => setNotes(e.target.value)} />
+      </Field>
+      <button
+        disabled={!title || !date}
+        onClick={() => onSubmit({ title, date, category, notes })}
+        className="w-full mt-2 py-3 rounded-full font-semibold text-white disabled:opacity-40"
+        style={{ background: "#C7A491" }}
+      >
+        Save
+      </button>
+    </div>
+  );
+}
+
+function AssignmentForm({ onSubmit, classes, prefillDate }) {
+  const [title, setTitle] = useState("");
+  const [classId, setClassId] = useState(classes[0]?.id || "");
+  const [type, setType] = useState("assignment");
+  const [dueDate, setDueDate] = useState(prefillDate || toISO(new Date()));
+
+  return (
+    <div>
+      <Field label="Title">
+        <input style={inputStyle} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Essay draft" />
+      </Field>
+      <Field label="Class">
+        <select style={inputStyle} value={classId} onChange={(e) => setClassId(e.target.value)}>
+          <option value="">No specific class</option>
+          {classes.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
+      </Field>
+      <Field label="Type">
+        <div className="flex gap-2">
+          {Object.entries(ASSIGN_TYPE).map(([k, v]) => (
+            <button
+              key={k}
+              onClick={() => setType(k)}
+              className="flex-1 py-2 rounded-full font-medium"
+              style={{ fontSize: "0.8em", background: type === k ? "#6B5142" : "#FAF3EB", color: type === k ? "white" : "#96897E" }}
+            >
+              {v.label}
+            </button>
+          ))}
+        </div>
+      </Field>
+      <Field label="Due date">
+        <input type="date" style={inputStyle} value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+      </Field>
+      <button
+        disabled={!title || !dueDate}
+        onClick={() => {
+          onSubmit({ title, classId: classId || null, type, dueDate });
+          setTitle("");
+        }}
+        className="w-full mt-2 py-3 rounded-full font-semibold text-white disabled:opacity-40"
+        style={{ background: "#C7A491" }}
+      >
+        Save
+      </button>
+    </div>
+  );
+}
+
+function TodoForm({ onSubmit, prefillDate }) {
+  const [title, setTitle] = useState("");
+  const [hasDueDate, setHasDueDate] = useState(!!prefillDate);
+  const [dueDate, setDueDate] = useState(prefillDate || toISO(new Date()));
+
+  return (
+    <div>
+      <Field label="What do you need to do?">
+        <input style={inputStyle} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Call about housing form" />
+      </Field>
+      <button
+        onClick={() => setHasDueDate((v) => !v)}
+        className="flex items-center gap-2 mb-3"
+        type="button"
+      >
+        <span
+          className="w-5 h-5 rounded flex items-center justify-center"
+          style={{ background: hasDueDate ? "#C7A491" : "#EECFCA" }}
+        >
+          {hasDueDate && <Check size={14} color="white" />}
+        </span>
+        <span style={{ fontSize: "0.85em", color: "#96897E" }}>Give it a due date (shows on the calendar)</span>
+      </button>
+      {hasDueDate && (
+        <Field label="Due date">
+          <input type="date" style={inputStyle} value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+        </Field>
+      )}
+      <button
+        disabled={!title}
+        onClick={() => {
+          onSubmit({ title, dueDate: hasDueDate ? dueDate : null });
+          setTitle("");
+        }}
+        className="w-full mt-2 py-3 rounded-full font-semibold text-white disabled:opacity-40"
+        style={{ background: "#C7A491" }}
+      >
+        Save
+      </button>
+    </div>
+  );
+}
+
+// ---------- Manage classes modal ----------
+function ManageModal({ classes, onClose, onRemove, onAddNew }) {
+  return (
+    <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4" style={{ background: "rgba(30,25,15,0.45)" }} onClick={onClose}>
+      <div className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 max-h-[85vh] overflow-y-auto" style={{ background: "#FFFFFF" }} onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-display" style={{ fontSize: "1.3em", fontWeight: 700, color: "#6B5142" }}>Your classes</h3>
+          <button onClick={onClose} className="p-1.5 rounded-full" style={{ background: "#FAF3EB" }}><X size={18} /></button>
+        </div>
+        <div className="flex flex-col gap-2 mb-4">
+          {classes.length === 0 && <Empty text="No classes added yet." />}
+          {classes.map((c) => (
+            <div key={c.id} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: c.color, color: "white" }}>
+              <div>
+                <p className="font-medium" style={{ fontSize: "0.95em" }}>{c.name}</p>
+                <p style={{ fontSize: "0.75em", opacity: 0.9 }}>
+                  {c.schedule
+                    .slice()
+                    .sort((a, b) => a.day - b.day)
+                    .map((s) => `${DAYS[s.day]} ${s.startTime}–${s.endTime}`)
+                    .join(" · ")}
+                </p>
+              </div>
+              <button onClick={() => onRemove(c.id)} aria-label="Delete class" className="p-1 rounded-full">
+                <Trash2 size={15} />
+              </button>
+            </div>
+          ))}
+        </div>
+        <button onClick={onAddNew} className="w-full py-3 rounded-full font-semibold text-white flex items-center justify-center gap-2" style={{ background: "#C7A491" }}>
+          <Plus size={18} /> Add a class
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<CollegeCalendar />);
 </script>
 </body>
 </html>
